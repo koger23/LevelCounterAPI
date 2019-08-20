@@ -1,7 +1,8 @@
 ﻿using LevelCounter.Models.DTO;
 using LevelCounter.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace LevelCounter.Exceptions
@@ -17,8 +18,8 @@ namespace LevelCounter.Exceptions
             this.accountService = accountService;
         }
 
-        [HttpPost("create")]
-        public async Task<ActionResult> SignUp(SignupRequest signUpRequest)
+        [HttpPost("signup")]
+        public async Task<ActionResult> SignUp([FromBody] SignupRequest signUpRequest)
         {
             var errors = await accountService.SignUpAsync(signUpRequest);
             if (errors.Count == 0)
@@ -31,16 +32,21 @@ namespace LevelCounter.Exceptions
             return BadRequest(errors);
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [Authorize]
+        [HttpPut("update")]
+        public async Task<IActionResult> Update([FromBody] UserEditRequest userEditRequest)
         {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(userEditRequest);
+            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var errors = await accountService.UpdateAsync(userId, userEditRequest);
+            if (errors.Count == 0)
+            {
+                return new OkObjectResult("Userdata updated successfully.");
+            }
+            return BadRequest(errors);
         }
     }
 }

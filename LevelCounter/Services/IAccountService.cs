@@ -14,5 +14,6 @@ namespace LevelCounter.Services
         Task<List<string>> SignUpAsync(SignupRequest request);
         AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl);
         Task<ApplicationUser> FindByIdAsync(string userId);
+        Task<List<string>> UpdateAsync(string userId, UserEditRequest userEditRequest);
     }
 }

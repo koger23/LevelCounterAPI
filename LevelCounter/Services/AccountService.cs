@@ -62,5 +62,28 @@ namespace LevelCounter.Services
                 .Select(e => e.Description)
                 .ToList();
         }
+
+        public async Task<List<string>> UpdateAsync(string userId, UserEditRequest userEditRequest)
+        {
+            var errorList = new List<string>();
+            var user = await userManager.FindByIdAsync(userId);
+            user.Email = userEditRequest.Email;
+            user.UserName = userEditRequest.UserName;
+            var passwordChangeResult = await userManager.ChangePasswordAsync(user, userEditRequest.CurrentPassword, userEditRequest.NewPassword);
+            if (!passwordChangeResult.Succeeded)
+            {
+                errorList.AddRange(passwordChangeResult.Errors
+                    .Select(e => e.Description)
+                    .ToList());
+            }
+            var userUpdateResult = await userManager.UpdateAsync(user);
+            if (!userUpdateResult.Succeeded)
+            {
+                errorList.AddRange(userUpdateResult.Errors
+                                    .Select(e => e.Description)
+                                    .ToList());
+            }
+            return errorList;
+        }
     }
 }
