@@ -6,14 +6,13 @@ namespace HotelBookingApp.Models.DTO
     public class LoginRequest
     {
         [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        public string UserName { get; set; }
 
         [Required]
         public string Password { get; set; }
 
         [Display(Name = "Remember Me")]
-        public bool RememberMe { get; set; } = true;
+        public bool RememberMe { get; set; } = false;
         public List<string> ErrorMessages { get; set; } = new List<string>();
     }
 }

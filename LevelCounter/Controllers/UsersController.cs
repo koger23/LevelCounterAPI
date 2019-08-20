@@ -1,5 +1,7 @@
-﻿using LevelCounter.Models.DTO;
+﻿using HotelBookingApp.Models.DTO;
+using LevelCounter.Models.DTO;
 using LevelCounter.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -12,6 +14,7 @@ namespace LevelCounter.Exceptions
     public class UsersController : ControllerBase
     {
         private readonly IAccountService accountService;
+        private const string authScheme = JwtBearerDefaults.AuthenticationScheme;
 
         public UsersController(IAccountService accountService)
         {
@@ -33,7 +36,19 @@ namespace LevelCounter.Exceptions
             return BadRequest(errors);
         }
 
-        [Authorize]
+        [AllowAnonymous]
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            var response = await accountService.SignInAsync(request);
+            if (response.Token == null)
+            {
+                return BadRequest(response.ErrorMessages);
+            }
+            return Ok(response);
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
         [HttpPut("update")]
         public async Task<IActionResult> Update([FromBody] UserEditRequest userEditRequest)
         {
@@ -50,7 +65,7 @@ namespace LevelCounter.Exceptions
             return BadRequest(errors);
         }
 
-        [Authorize(Roles = "Admin, User")]
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
         [HttpGet("userdata")]
         public async Task<ObjectResult> GetUserData()
         {

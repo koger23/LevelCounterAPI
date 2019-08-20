@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using LevelCounter.Models;
+﻿using LevelCounter.Models;
 using LevelCounter.Repository;
 using LevelCounter.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace LevelCounter
 {
@@ -73,11 +68,11 @@ namespace LevelCounter
                 applicationContext.Database.Migrate();
                 app.UseHsts();
             }
+            app.UseHttpsRedirection();
             app.UseAuthentication();
             SeedRoles(roleManager);
             SeedAdminUser(userManager);
             app.UseStaticFiles();
-            app.UseHttpsRedirection();
             app.UseMvc();
         }
 

@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using HotelBookingApp.Models.DTO;
 using LevelCounter.Exceptions;
@@ -8,6 +12,8 @@ using LevelCounter.Models.DTO;
 using LevelCounter.Repository;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace LevelCounter.Services
 {
@@ -17,12 +23,14 @@ namespace LevelCounter.Services
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private const string DEFAULT_ROLE = "User";
+        private readonly string apiSecretKey;
 
-        public AccountService(ApplicationContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AccountService(ApplicationContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
         {
             this.context = context;
             this.userManager = userManager;
             this.signInManager = signInManager;
+            apiSecretKey = configuration.GetSection("APISecretKey").Value;
         }
         public AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl)
         {
@@ -39,9 +47,43 @@ namespace LevelCounter.Services
             throw new ItemNotFoundException();
         }
 
-        public Task<List<string>> SignInAsync(LoginRequest request)
+        public async Task<LoginResponse> SignInAsync(LoginRequest request)
         {
-            throw new System.NotImplementedException();
+            var errors = new List<string>();
+            var result = await signInManager.PasswordSignInAsync(request.UserName, request.Password, request.RememberMe, lockoutOnFailure: false);
+            checkLoginErrors(result, errors);
+            var response = new LoginResponse
+            {
+                ErrorMessages = errors
+            };
+
+            if (errors.Count == 0)
+            {
+                var user = await userManager.FindByNameAsync(request.UserName);
+                response.Token = await GenerateJwtToken(user.Email, user);
+            }
+            return response;
+        }
+
+        public List<string> checkLoginErrors(SignInResult result, List<string> errors)
+        {
+            if (result.IsLockedOut)
+            {
+                errors.Add("User account locked out.");
+            }
+            if (result.IsNotAllowed)
+            {
+                errors.Add("User is not allowed to login.");
+            }
+            if (result.RequiresTwoFactor)
+            {
+                errors.Add("Two factor authentication is required.");
+            }
+            if (!result.Succeeded)
+            {
+                errors.Add("Invalid login attempt");
+            }
+            return errors;
         }
 
         public Task SignOutAsync()
@@ -90,6 +132,29 @@ namespace LevelCounter.Services
                                     .ToList());
             }
             return errorList;
+        }
+
+        public async Task<string> GenerateJwtToken(string email, ApplicationUser user)
+        {
+            var userRoles = await userManager.GetRolesAsync(user);
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Role, userRoles[0])
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(apiSecretKey));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.Now.AddMonths(1);
+
+            var token = new JwtSecurityToken(
+                "Hotel-Booking",
+                "Hotel-Booking",
+                claims,
+                expires: expires,
+                signingCredentials: creds
+            );
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }
