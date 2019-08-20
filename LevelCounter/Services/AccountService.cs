@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using HotelBookingApp.Models.DTO;
+using LevelCounter.Exceptions;
 using LevelCounter.Models;
 using LevelCounter.Models.DTO;
 using LevelCounter.Repository;
@@ -28,9 +29,14 @@ namespace LevelCounter.Services
             throw new System.NotImplementedException();
         }
 
-        public Task<ApplicationUser> FindByIdAsync(string userId)
+        public async Task<ApplicationUser> FindByIdAsync(string userId)
         {
-            throw new System.NotImplementedException();
+            var user = await userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                return user;
+            }
+            throw new ItemNotFoundException();
         }
 
         public Task<List<string>> SignInAsync(LoginRequest request)

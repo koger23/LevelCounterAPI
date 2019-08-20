@@ -18,6 +18,7 @@ namespace LevelCounter.Exceptions
             this.accountService = accountService;
         }
 
+        [AllowAnonymous]
         [HttpPost("signup")]
         public async Task<ActionResult> SignUp([FromBody] SignupRequest signUpRequest)
         {
@@ -47,6 +48,21 @@ namespace LevelCounter.Exceptions
                 return new OkObjectResult("Userdata updated successfully.");
             }
             return BadRequest(errors);
+        }
+
+        [Authorize(Roles = "Admin, User")]
+        [HttpGet("userdata")]
+        public async Task<ObjectResult> GetUserData()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                var user = await accountService.FindByIdAsync(userId);
+                return new OkObjectResult(user);
+            } catch (ItemNotFoundException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }
