@@ -17,12 +17,18 @@ namespace LevelCounter.Exceptions
             this.accountService = accountService;
         }
 
-        // POST api/values
         [HttpPost("create")]
-        public async Task<HttpStatusCode> SignUp(SignupRequest signUpRequest)
+        public async Task<ActionResult> SignUp(SignupRequest signUpRequest)
         {
-            await accountService.SignUpAsync(signUpRequest);
-            return HttpStatusCode.Created;
+            var errors = await accountService.SignUpAsync(signUpRequest);
+            if (errors.Count == 0)
+            {
+                return new ObjectResult(errors)
+                {
+                    StatusCode = 201
+                };
+            }
+            return BadRequest(errors);
         }
 
         // PUT api/values/5
