@@ -19,16 +19,14 @@ namespace LevelCounter.Services
 {
     public class AccountService : IAccountService
     {
-        private readonly ApplicationContext context;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
         private const string DEFAULT_ROLE = "User";
         private readonly string apiSecretKey;
         private readonly IMapper mapper;
 
-        public AccountService(ApplicationContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IMapper mapper)
+        public AccountService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IMapper mapper)
         {
-            this.context = context;
             this.userManager = userManager;
             this.signInManager = signInManager;
             apiSecretKey = configuration.GetSection("APISecretKey").Value;
@@ -82,11 +80,6 @@ namespace LevelCounter.Services
                 errors.Add("Invalid login attempt");
             }
             return errors;
-        }
-
-        public Task SignOutAsync()
-        {
-            throw new System.NotImplementedException();
         }
 
         public async Task<List<string>> SignUpAsync(SignupRequest request)

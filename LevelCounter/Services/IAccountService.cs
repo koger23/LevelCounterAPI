@@ -8,7 +8,6 @@ namespace LevelCounter.Services
     public interface IAccountService
     {
         Task<LoginResponse> SignInAsync(LoginRequest request);
-        Task SignOutAsync();
         Task<List<string>> SignUpAsync(SignupRequest request);
         Task<UserResponse> FindByIdAsync(string userId);
         Task<List<string>> UpdateAsync(string userId, UserEditRequest userEditRequest);
