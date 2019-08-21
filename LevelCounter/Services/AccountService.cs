@@ -134,7 +134,13 @@ namespace LevelCounter.Services
             return errorList;
         }
 
-        public async Task<string> GenerateJwtToken(ApplicationUser user)
+        public async Task<int> GetUserStatisticId(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            return user.StatisticsId;
+        }
+
+        private async Task<string> GenerateJwtToken(ApplicationUser user)
         {
             var userRoles = await userManager.GetRolesAsync(user);
             var claims = new List<Claim>
