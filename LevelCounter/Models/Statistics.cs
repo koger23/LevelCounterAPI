@@ -9,8 +9,7 @@ namespace LevelCounter.Models
         public int GamesPlayed { get; set; }
         public int RoundsPlayed { get; set; }
         public long PlayTime { get; set; }
-        public int UserId { get; set; }
         [JsonIgnore]
-        public ApplicationUser User { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
     }
 }

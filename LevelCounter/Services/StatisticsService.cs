@@ -21,7 +21,7 @@ namespace LevelCounter.Services
         {
             var user = await accountService.FindByIdAsync(userId);
             return await context.Statistics
-                .Include(s => s.User)
+                .Include(s => s.ApplicationUser)
                 .SingleOrDefaultAsync(s => s.StatisticsId == user.StatisticsId) ?? throw new ItemNotFoundException();
         }
     }
