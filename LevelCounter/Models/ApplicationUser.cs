@@ -52,5 +52,6 @@ namespace LevelCounter.Models
         public DateTime RegisterDate { get; set; } = DateTime.Now;
         public string AvatarUrl;
         public IEnumerable<UserRelationships> Relationships { get; set; }
+        public bool IsPublic { get; set; } = true;
     }
 }
