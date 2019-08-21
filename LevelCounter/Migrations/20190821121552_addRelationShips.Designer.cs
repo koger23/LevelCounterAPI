@@ -4,14 +4,16 @@ using LevelCounter.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LevelCounter.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20190821121552_addRelationShips")]
+    partial class addRelationShips
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,8 +40,6 @@ namespace LevelCounter.Migrations
                         .IsRequired();
 
                     b.Property<int>("Gender");
-
-                    b.Property<bool>("IsPublic");
 
                     b.Property<bool>("LockoutEnabled");
 
@@ -97,8 +97,6 @@ namespace LevelCounter.Migrations
 
                     b.Property<int>("RelationshipState");
 
-                    b.Property<string>("State");
-
                     b.Property<string>("UserId");
 
                     b.HasKey("RelationshipId");
@@ -107,7 +105,7 @@ namespace LevelCounter.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Relationships");
+                    b.ToTable("Relationship");
                 });
 
             modelBuilder.Entity("LevelCounter.Models.Statistics", b =>
@@ -127,6 +125,21 @@ namespace LevelCounter.Migrations
                     b.HasKey("StatisticsId");
 
                     b.ToTable("Statistics");
+                });
+
+            modelBuilder.Entity("LevelCounter.Models.UserRelationships", b =>
+                {
+                    b.Property<string>("ApplicationUserId");
+
+                    b.Property<int>("RelationshipId");
+
+                    b.Property<int>("id");
+
+                    b.HasKey("ApplicationUserId", "RelationshipId");
+
+                    b.HasIndex("RelationshipId");
+
+                    b.ToTable("UserRelationships");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -254,8 +267,21 @@ namespace LevelCounter.Migrations
                         .HasForeignKey("RelatingUserId");
 
                     b.HasOne("LevelCounter.Models.ApplicationUser", "User")
-                        .WithMany("Relationships")
+                        .WithMany()
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("LevelCounter.Models.UserRelationships", b =>
+                {
+                    b.HasOne("LevelCounter.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Relationships")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("LevelCounter.Models.Relationship", "Relationship")
+                        .WithMany("Relationships")
+                        .HasForeignKey("RelationshipId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

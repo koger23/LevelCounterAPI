@@ -15,6 +15,7 @@ namespace LevelCounter.Configs
                 mc.CreateMap<SignupRequest, ApplicationUser>()
                     .ForMember(dest => dest.FullName, opts => opts.MapFrom(src => src.FullName))
                     .ForMember(dest => dest.Statistics, opts => opts.MapFrom(src => new Statistics()));
+                mc.CreateMap<ApplicationUser, UserShortResponse>();
             });
         }
     }

@@ -3,7 +3,9 @@ using HotelBookingApp.Models.DTO;
 using LevelCounter.Exceptions;
 using LevelCounter.Models;
 using LevelCounter.Models.DTO;
+using LevelCounter.Repository;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -23,13 +25,15 @@ namespace LevelCounter.Services
         private const string DEFAULT_ROLE = "User";
         private readonly string apiSecretKey;
         private readonly IMapper mapper;
+        private readonly ApplicationContext context;
 
-        public AccountService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IMapper mapper)
+        public AccountService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IMapper mapper, ApplicationContext context)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             apiSecretKey = configuration.GetSection("APISecretKey").Value;
             this.mapper = mapper;
+            this.context = context;
         }
 
         public async Task<UserResponse> FindByIdAsync(string userId)
@@ -38,6 +42,16 @@ namespace LevelCounter.Services
             if (user != null)
             {
                 return mapper.Map<UserResponse>(user);
+            }
+            throw new ItemNotFoundException();
+        }
+
+        public async Task<ApplicationUser> FindUserByIdAsync(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                return user;
             }
             throw new ItemNotFoundException();
         }
@@ -54,7 +68,7 @@ namespace LevelCounter.Services
 
             if (errors.Count == 0)
             {
-                var user = await userManager.FindByNameAsync    (request.UserName);
+                var user = await userManager.FindByNameAsync(request.UserName);
                 response.Token = await GenerateJwtToken(user);
             }
             return response;
@@ -120,7 +134,7 @@ namespace LevelCounter.Services
             return errorList;
         }
 
-        public async Task<int> GetUserStatisticId(string userId)
+        public async Task<int> GetUserStatisticIdAsync(string userId)
         {
             var user = await userManager.FindByIdAsync(userId);
             return user.StatisticsId;
@@ -146,6 +160,18 @@ namespace LevelCounter.Services
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public async Task<List<UserShortResponse>> GetUsersAsync()
+        {
+            var users = await context.Users.Where(u => u.IsPublic).ToListAsync();
+            return mapper.Map<List<UserShortResponse>>(users);
+        }
+
+        public ApplicationUser FindUserByName(string name)
+        {
+            return context.Users.FirstOrDefault(u => u.UserName == name) 
+                ?? throw new ItemNotFoundException();
         }
     }
 }

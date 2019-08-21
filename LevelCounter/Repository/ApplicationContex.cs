@@ -7,6 +7,8 @@ namespace LevelCounter.Repository
     public class ApplicationContext : IdentityDbContext<ApplicationUser>
     {
         public virtual DbSet<Statistics> Statistics { get; set; }
+        public virtual DbSet<ApplicationUser> Users { get; set; }
+        public virtual DbSet<Relationship> Relationships { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
@@ -15,6 +17,10 @@ namespace LevelCounter.Repository
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ApplicationUser>()
+                .HasMany(au => au.Relationships)
+                .WithOne(r => r.User);
         }
     }
 }
