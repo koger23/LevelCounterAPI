@@ -91,12 +91,7 @@ namespace LevelCounter.Services
 
         public async Task<List<string>> SignUpAsync(SignupRequest request)
         {
-            var user = new ApplicationUser
-            {
-                UserName = request.UserName,
-                Email = request.Email,
-                Statistics = new Statistics()
-            };
+            var user = mapper.Map<ApplicationUser>(request);
             var result = await userManager.CreateAsync(user, request.Password);
 
             if (result.Succeeded)
