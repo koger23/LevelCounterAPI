@@ -4,14 +4,16 @@ using LevelCounter.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LevelCounter.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20190821094845_fixGender")]
+    partial class fixGender
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,8 +61,7 @@ namespace LevelCounter.Migrations
 
                     b.Property<string>("SecurityStamp");
 
-                    b.Property<string>("Sex")
-                        .IsRequired();
+                    b.Property<int>("Sex");
 
                     b.Property<int>("StatisticsId");
 

@@ -10,7 +10,8 @@ namespace LevelCounter.Models.DTO
     {
         public string UserName { get; set; }
         public string FullName { get; set; }
-        public string Gender { get; set; }
+        public string Sex { get; set; }
+        public Genders Gender { get; set; }
         public string Email { get; set; }
         public DateTime RegisterDate { get; set; }
         public int StatisticsId { get; set; }

@@ -39,6 +39,7 @@ namespace LevelCounter.Configs
                     {
                         UserName = userEntry.Key,
                         Email = userEntry.Key,
+                        Gender = ApplicationUser.Genders.MALE,
                         Statistics = new Statistics()
                     };
                     var result = userManager.CreateAsync(user, password).Result;
