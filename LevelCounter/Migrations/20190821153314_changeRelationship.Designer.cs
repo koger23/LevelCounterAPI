@@ -4,14 +4,16 @@ using LevelCounter.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LevelCounter.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20190821153314_changeRelationship")]
+    partial class changeRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -127,6 +129,21 @@ namespace LevelCounter.Migrations
                     b.HasKey("StatisticsId");
 
                     b.ToTable("Statistics");
+                });
+
+            modelBuilder.Entity("LevelCounter.Models.UserRelationships", b =>
+                {
+                    b.Property<string>("ApplicationUserId");
+
+                    b.Property<int>("RelationshipId");
+
+                    b.Property<int>("id");
+
+                    b.HasKey("ApplicationUserId", "RelationshipId");
+
+                    b.HasIndex("RelationshipId");
+
+                    b.ToTable("UserRelationships");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -254,8 +271,21 @@ namespace LevelCounter.Migrations
                         .HasForeignKey("RelatingUserId");
 
                     b.HasOne("LevelCounter.Models.ApplicationUser", "User")
-                        .WithMany("Relationships")
+                        .WithMany()
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("LevelCounter.Models.UserRelationships", b =>
+                {
+                    b.HasOne("LevelCounter.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Relationships")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("LevelCounter.Models.Relationship", "Relationship")
+                        .WithMany("Relationships")
+                        .HasForeignKey("RelationshipId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

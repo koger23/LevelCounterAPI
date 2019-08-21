@@ -14,16 +14,18 @@ namespace LevelCounter.Exceptions
     public class UserController : ControllerBase
     {
         private readonly IAccountService accountService;
+        private readonly IUserService userService;
         private const string authScheme = JwtBearerDefaults.AuthenticationScheme;
 
-        public UserController(IAccountService accountService)
+        public UserController(IAccountService accountService, IUserService userService)
         {
             this.accountService = accountService;
+            this.userService = userService;
         }
 
         [AllowAnonymous]
         [HttpPost("signup")]
-        public async Task<ActionResult> SignUp([FromBody] SignupRequest signUpRequest)
+        public async Task<IActionResult> SignUp([FromBody] SignupRequest signUpRequest)
         {
             var errors = await accountService.SignUpAsync(signUpRequest);
             if (errors.Count == 0)
@@ -67,7 +69,7 @@ namespace LevelCounter.Exceptions
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
         [HttpGet("userdata")]
-        public async Task<ObjectResult> GetUserData()
+        public async Task<IActionResult> GetUserData()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             try
@@ -79,6 +81,50 @@ namespace LevelCounter.Exceptions
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpGet("userlist")]
+        public async Task<IActionResult> GetUserList()
+        {
+            var users = await accountService.GetUsersAsync();
+            return Ok(users);
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpGet("friends")]
+        public async Task<IActionResult> GetFriends()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await userService.GetFriendsAsync(userId);
+            return new OkObjectResult(user);
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpGet("requests/pending")]
+        public async Task<IActionResult> GetPending()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await userService.GetPendingRequestsAsync(userId);
+            return new OkObjectResult(user);
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpGet("requests/blocked")]
+        public async Task<IActionResult> GetBlocked()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await userService.GetBlockedAsync(userId);
+            return new OkObjectResult(user);
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpGet("requests/unconfirmed")]
+        public async Task<IActionResult> GetUnconfirmed()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await userService.GetUnconfirmedAsync(userId);
+            return new OkObjectResult(user);
         }
     }
 }

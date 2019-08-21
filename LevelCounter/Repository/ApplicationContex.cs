@@ -7,6 +7,8 @@ namespace LevelCounter.Repository
     public class ApplicationContext : IdentityDbContext<ApplicationUser>
     {
         public virtual DbSet<Statistics> Statistics { get; set; }
+        public virtual DbSet<ApplicationUser> Users { get; set; }
+        public virtual DbSet<Relationship> Relationships { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
@@ -16,18 +18,9 @@ namespace LevelCounter.Repository
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<UserRelationships>()
-                .HasKey(ur => new { ur.ApplicationUserId, ur.RelationshipId });
-
-            modelBuilder.Entity<UserRelationships>()
-                .HasOne(ur => ur.Relationship)
-                .WithMany(r => r.Relationships)
-                .HasForeignKey(ur => ur.RelationshipId);
-
-            modelBuilder.Entity<UserRelationships>()
-                .HasOne(ur => ur.ApplicationUser)
-                .WithMany(au => au.Relationships)
-                .HasForeignKey(ur => ur.ApplicationUserId);
+            modelBuilder.Entity<ApplicationUser>()
+                .HasMany(au => au.Relationships)
+                .WithOne(r => r.User);
         }
     }
 }

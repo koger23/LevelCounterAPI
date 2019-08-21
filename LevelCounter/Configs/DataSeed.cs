@@ -40,7 +40,9 @@ namespace LevelCounter.Configs
                         UserName = userEntry.Key,
                         Email = userEntry.Key,
                         Gender = ApplicationUser.Genders.MALE,
-                        Statistics = new Statistics()
+                        Statistics = new Statistics(),
+                        FullName = "Admin",
+                        IsPublic = false
                     };
                     var result = userManager.CreateAsync(user, password).Result;
                     if (result.Succeeded)

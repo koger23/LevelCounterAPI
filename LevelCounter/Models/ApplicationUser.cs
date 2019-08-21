@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LevelCounter.Models
 {
@@ -51,7 +53,7 @@ namespace LevelCounter.Models
         [Required]
         public DateTime RegisterDate { get; set; } = DateTime.Now;
         public string AvatarUrl;
-        public IEnumerable<UserRelationships> Relationships { get; set; }
+        public List<Relationship> Relationships { get; set; }
         public bool IsPublic { get; set; } = true;
     }
 }
