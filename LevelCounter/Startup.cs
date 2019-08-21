@@ -32,8 +32,6 @@ namespace LevelCounter
 
             services.AddDbContext<ApplicationContext>(opt =>
                 opt.UseSqlServer(Configuration.GetConnectionString(connectionString)));
-            services.AddScoped<IAccountService, AccountService>();
-            services.AddScoped<IStatisticsService, StatisticsService>();
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationContext>()
@@ -49,10 +47,14 @@ namespace LevelCounter
                     cfg.SaveToken = true;
                     cfg.TokenValidationParameters = new TokenValidationParameters
                     {
+                        ValidIssuer = "http://www.kogero.com",
+                        ValidAudience = "http://www.kogero.com",
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["APISecretKey"])),
                         ClockSkew = TimeSpan.Zero // remove delay of token when expire
                     };
                 });
+            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IStatisticsService, StatisticsService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 

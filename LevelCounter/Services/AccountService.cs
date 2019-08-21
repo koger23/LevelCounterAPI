@@ -59,8 +59,8 @@ namespace LevelCounter.Services
 
             if (errors.Count == 0)
             {
-                var user = await userManager.FindByNameAsync(request.UserName);
-                response.Token = await GenerateJwtToken(user.Email, user);
+                var user = await userManager.FindByNameAsync    (request.UserName);
+                response.Token = await GenerateJwtToken(user);
             }
             return response;
         }
@@ -134,7 +134,7 @@ namespace LevelCounter.Services
             return errorList;
         }
 
-        public async Task<string> GenerateJwtToken(string email, ApplicationUser user)
+        public async Task<string> GenerateJwtToken(ApplicationUser user)
         {
             var userRoles = await userManager.GetRolesAsync(user);
             var claims = new List<Claim>
@@ -142,14 +142,13 @@ namespace LevelCounter.Services
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Role, userRoles[0])
             };
-
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(apiSecretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expires = DateTime.Now.AddMonths(1);
 
             var token = new JwtSecurityToken(
-                "Hotel-Booking",
-                "Hotel-Booking",
+                "http://www.kogero.com",
+                "http://www.kogero.com",
                 claims,
                 expires: expires,
                 signingCredentials: creds
