@@ -8,17 +8,16 @@ using System.Threading.Tasks;
 
 namespace LevelCounter.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class RelationshipController : ControllerBase
     {
         private readonly IRelationshipService relationshipService;
-        private readonly IAccountService accountService;
         private const string authScheme = JwtBearerDefaults.AuthenticationScheme;
 
-        public RelationshipController(IAccountService accountService, IRelationshipService relationshipService)
+        public RelationshipController(IRelationshipService relationshipService)
         {
-            this.accountService = accountService;
             this.relationshipService = relationshipService;
         }
 

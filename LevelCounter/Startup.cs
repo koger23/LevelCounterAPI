@@ -24,6 +24,7 @@ namespace LevelCounter
             services.AddDbContextSetup(Configuration);
             services.AddIdentityConfiguration();
             services.AddAuthenticationConfiguration(Configuration);
+            services.AddSwaggerDoc();
             services.RegisterServices();
             services.AddMvcConfiguration();
         }
@@ -43,6 +44,11 @@ namespace LevelCounter
             app.UseAuthentication();
             DataSeed.SeedDefaultDatas(roleManager, userManager);
             app.UseStaticFiles();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+            });
             app.UseMvc();
         }
     }

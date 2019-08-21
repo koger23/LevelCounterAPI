@@ -8,7 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System;
+using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace LevelCounter.Configs
@@ -81,6 +84,20 @@ namespace LevelCounter.Configs
         {
             IMapper mapper = MappingProfiles.GetAutoMapperProfiles().CreateMapper();
             services.AddSingleton(mapper);
+            return services;
+        }
+
+        public static IServiceCollection AddSwaggerDoc(this IServiceCollection services)
+        {
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API Endpoints", Version = "v1" });
+                c.EnableAnnotations();
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+            });
             return services;
         }
     }

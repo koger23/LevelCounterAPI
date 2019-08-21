@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace LevelCounter.Exceptions
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
