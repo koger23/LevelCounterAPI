@@ -132,7 +132,7 @@ namespace LevelCounter.Exceptions
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
         [HttpPut("requests/{relationshipId}/confirm")]
-        public async Task<IActionResult> GetUnconfirmed(int relationshipId)
+        public async Task<IActionResult> Confirm(int relationshipId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             try
