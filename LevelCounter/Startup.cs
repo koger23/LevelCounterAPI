@@ -1,4 +1,6 @@
-﻿using LevelCounter.Models;
+﻿using AutoMapper;
+using LevelCounter.Configs;
+using LevelCounter.Models;
 using LevelCounter.Repository;
 using LevelCounter.Services;
 using Microsoft.AspNetCore.Builder;
@@ -53,6 +55,8 @@ namespace LevelCounter
                         ClockSkew = TimeSpan.Zero // remove delay of token when expire
                     };
                 });
+            IMapper mapper = MappingProfiles.GetAutoMapperProfiles().CreateMapper();
+            services.AddSingleton(mapper);
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IStatisticsService, StatisticsService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
