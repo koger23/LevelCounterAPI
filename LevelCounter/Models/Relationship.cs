@@ -19,16 +19,19 @@ namespace LevelCounter.Models
                         return "confirmed";
                     case (RelationshipStates.PENDING):
                         return "pending";
+                    case (RelationshipStates.UNKNOWN):
+                        return "unknown";
                 }
                 return "Invalid gender type";
             }
         }
-        public RelationshipStates RelationshipState { get; set; }
+        public RelationshipStates RelationshipState { get; set; } = RelationshipStates.UNKNOWN;
         public enum RelationshipStates
         {
             BLOCKED = 0,
             CONFIRMED = 1,
-            PENDING = 2
+            PENDING = 2,
+            UNKNOWN = 3
         }
         public IEnumerable<UserRelationships> Relationships { get; set; }
     }
