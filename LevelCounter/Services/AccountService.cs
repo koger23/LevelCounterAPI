@@ -1,19 +1,19 @@
-using AutoMapper;
+﻿using AutoMapper;
+using HotelBookingApp.Models.DTO;
+using LevelCounter.Exceptions;
+using LevelCounter.Models;
+using LevelCounter.Models.DTO;
+using LevelCounter.Repository;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using HotelBookingApp.Models.DTO;
-using LevelCounter.Exceptions;
-using LevelCounter.Models;
-using LevelCounter.Models.DTO;
-using LevelCounter.Repository;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
 namespace LevelCounter.Services
 {
@@ -49,7 +49,7 @@ namespace LevelCounter.Services
         {
             var errors = new List<string>();
             var result = await signInManager.PasswordSignInAsync(request.UserName, request.Password, request.RememberMe, lockoutOnFailure: false);
-            checkLoginErrors(result, errors);
+            CheckLoginErrors(result, errors);
             var response = new LoginResponse
             {
                 ErrorMessages = errors
@@ -63,7 +63,7 @@ namespace LevelCounter.Services
             return response;
         }
 
-        public List<string> checkLoginErrors(SignInResult result, List<string> errors)
+        private List<string> CheckLoginErrors(SignInResult result, List<string> errors)
         {
             if (result.IsLockedOut)
             {
