@@ -1,4 +1,4 @@
-﻿using System;
+using AutoMapper;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -24,25 +24,23 @@ namespace LevelCounter.Services
         private readonly SignInManager<ApplicationUser> signInManager;
         private const string DEFAULT_ROLE = "User";
         private readonly string apiSecretKey;
+        private readonly IMapper mapper;
 
-        public AccountService(ApplicationContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+        public AccountService(ApplicationContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration, IMapper mapper)
         {
             this.context = context;
             this.userManager = userManager;
             this.signInManager = signInManager;
             apiSecretKey = configuration.GetSection("APISecretKey").Value;
-        }
-        public AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl)
-        {
-            throw new System.NotImplementedException();
+            this.mapper = mapper;
         }
 
-        public async Task<ApplicationUser> FindByIdAsync(string userId)
+        public async Task<UserResponse> FindByIdAsync(string userId)
         {
             var user = await userManager.FindByIdAsync(userId);
             if (user != null)
             {
-                return user;
+                return mapper.Map<UserResponse>(user);
             }
             throw new ItemNotFoundException();
         }
