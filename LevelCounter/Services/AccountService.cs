@@ -115,6 +115,7 @@ namespace LevelCounter.Services
             var user = await userManager.FindByIdAsync(userId);
             user.Email = userEditRequest.Email;
             user.UserName = userEditRequest.UserName;
+            user.FullName = userEditRequest.FullName;
             var passwordChangeResult = await userManager.ChangePasswordAsync(user, userEditRequest.CurrentPassword, userEditRequest.NewPassword);
             if (!passwordChangeResult.Succeeded)
             {

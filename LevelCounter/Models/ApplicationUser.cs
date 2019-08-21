@@ -7,6 +7,8 @@ namespace LevelCounter.Models
     public class ApplicationUser : IdentityUser
     {
         [Required]
+        public string FullName { get; set; }
+        [Required]
         public Gender Sex { get; set; }
         public enum Gender
         {
@@ -16,7 +18,7 @@ namespace LevelCounter.Models
         public int StatisticsId { get; set; }
         public Statistics Statistics { get; set; }
         [Required]
-        public DateTime RegisterDate { get; set; }
+        public DateTime RegisterDate { get; set; } = DateTime.Now;
         public string AvatarUrl;
     }
 }
