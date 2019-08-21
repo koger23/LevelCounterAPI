@@ -167,5 +167,11 @@ namespace LevelCounter.Services
             var users = await context.Users.Where(u => u.IsPublic).ToListAsync();
             return mapper.Map<List<UserShortResponse>>(users);
         }
+
+        public ApplicationUser FindUserByName(string name)
+        {
+            return context.Users.FirstOrDefault(u => u.UserName == name) 
+                ?? throw new ItemNotFoundException();
+        }
     }
 }

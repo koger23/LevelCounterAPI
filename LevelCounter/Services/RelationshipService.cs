@@ -1,4 +1,5 @@
-﻿using LevelCounter.Models;
+﻿using LevelCounter.Exceptions;
+using LevelCounter.Models;
 using LevelCounter.Repository;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace LevelCounter.Services
         public async Task<Relationship> MakeFriendRequest(string friendName, string userId)
         {
             var user = await accountService.FindUserByIdAsync(userId);
-            var friend = context.Users.FirstOrDefault(u => u.UserName == friendName);
+            var friend = accountService.FindUserByName(friendName);
             var existingRelationship = GetRelationshipByNames(friendName, userId);
             if (CheckRelationshipCanBePending(existingRelationship))
             {
@@ -91,7 +92,7 @@ namespace LevelCounter.Services
         {
             return context.Relationships
                 .Where(r => r.RelationshipId == relationshipId)
-                .SingleOrDefault();
+                .SingleOrDefault() ?? throw new ItemNotFoundException();
         }
     }
 }

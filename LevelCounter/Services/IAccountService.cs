@@ -15,5 +15,6 @@ namespace LevelCounter.Services
         Task<int> GetUserStatisticIdAsync(string userId);
         Task<List<UserShortResponse>> GetUsersAsync();
         Task<ApplicationUser> FindUserByIdAsync(string userId);
+        ApplicationUser FindUserByName(string userId);
     }
 }
