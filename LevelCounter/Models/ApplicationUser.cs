@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace LevelCounter.Models
@@ -50,5 +51,6 @@ namespace LevelCounter.Models
         [Required]
         public DateTime RegisterDate { get; set; } = DateTime.Now;
         public string AvatarUrl;
+        public IEnumerable<UserRelationships> Relationships { get; set; }
     }
 }
