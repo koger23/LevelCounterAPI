@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using LevelCounter.Models;
 using System.Threading.Tasks;
 
 namespace LevelCounter.Services
 {
     public interface IStatisticsService
     {
+        Task<Statistics> GetUserStatistics(string userId);
     }
 }
