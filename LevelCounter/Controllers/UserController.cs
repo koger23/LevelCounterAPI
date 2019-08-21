@@ -11,12 +11,12 @@ namespace LevelCounter.Exceptions
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly IAccountService accountService;
         private const string authScheme = JwtBearerDefaults.AuthenticationScheme;
 
-        public UsersController(IAccountService accountService)
+        public UserController(IAccountService accountService)
         {
             this.accountService = accountService;
         }
@@ -74,7 +74,8 @@ namespace LevelCounter.Exceptions
             {
                 var user = await accountService.FindByIdAsync(userId);
                 return new OkObjectResult(user);
-            } catch (ItemNotFoundException e)
+            }
+            catch (ItemNotFoundException e)
             {
                 return BadRequest(e.Message);
             }
