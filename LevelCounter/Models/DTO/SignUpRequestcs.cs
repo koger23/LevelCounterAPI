@@ -23,6 +23,7 @@ namespace LevelCounter.Models.DTO
 
         [Compare("Password", ErrorMessage = "The two password do not match.")]
         public string VerifyPassword { get; set; }
+        public string Gender { get; set; } = "male";
 
         public List<string> ErrorMessages { get; set; } = new List<string>();
     }
