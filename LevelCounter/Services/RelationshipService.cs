@@ -31,11 +31,14 @@ namespace LevelCounter.Services
             return await CreateNewRelationship(user, friend);
         }
 
-        public async Task ConfirmRequest(int relationshipId)
+        public async Task ConfirmRequest(int relationshipId, string userId)
         {
             var relationship = GetRelationshipById(relationshipId);
-            relationship.RelationshipState = Relationship.RelationshipStates.CONFIRMED;
-            await UpdateAndSaveAsync(relationship);
+            if (relationship.RelatingUserId == userId)
+            {
+                relationship.RelationshipState = Relationship.RelationshipStates.CONFIRMED;
+                await UpdateAndSaveAsync(relationship);
+            }
         }
 
         public async Task BlockRequest(int relationshipId)

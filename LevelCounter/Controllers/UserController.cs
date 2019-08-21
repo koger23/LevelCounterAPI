@@ -15,12 +15,14 @@ namespace LevelCounter.Exceptions
     {
         private readonly IAccountService accountService;
         private readonly IUserService userService;
+        private readonly IRelationshipService relationshipService;
         private const string authScheme = JwtBearerDefaults.AuthenticationScheme;
 
-        public UserController(IAccountService accountService, IUserService userService)
+        public UserController(IAccountService accountService, IUserService userService, IRelationshipService relationshipService)
         {
             this.accountService = accountService;
             this.userService = userService;
+            this.relationshipService = relationshipService;
         }
 
         [AllowAnonymous]
@@ -62,7 +64,7 @@ namespace LevelCounter.Exceptions
             var errors = await accountService.UpdateAsync(userId, userEditRequest);
             if (errors.Count == 0)
             {
-                return new OkObjectResult("Userdata updated successfully.");
+                return Ok("Userdata updated successfully.");
             }
             return BadRequest(errors);
         }
@@ -75,7 +77,7 @@ namespace LevelCounter.Exceptions
             try
             {
                 var user = await accountService.FindByIdAsync(userId);
-                return new OkObjectResult(user);
+                return Ok(user);
             }
             catch (ItemNotFoundException e)
             {
@@ -97,7 +99,7 @@ namespace LevelCounter.Exceptions
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await userService.GetFriendsAsync(userId);
-            return new OkObjectResult(user);
+            return Ok(user);
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
@@ -106,7 +108,7 @@ namespace LevelCounter.Exceptions
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await userService.GetPendingRequestsAsync(userId);
-            return new OkObjectResult(user);
+            return Ok(user);
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
@@ -115,7 +117,7 @@ namespace LevelCounter.Exceptions
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await userService.GetBlockedAsync(userId);
-            return new OkObjectResult(user);
+            return Ok(user);
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
@@ -124,7 +126,23 @@ namespace LevelCounter.Exceptions
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await userService.GetUnconfirmedAsync(userId);
-            return new OkObjectResult(user);
+            return Ok(user);
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpPut("requests/{relationshipId}/confirm")]
+        public async Task<IActionResult> GetUnconfirmed(int relationshipId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                await relationshipService.ConfirmRequest(relationshipId, userId);
+                return Ok("Confirmed");
+            }
+            catch (ItemNotFoundException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }

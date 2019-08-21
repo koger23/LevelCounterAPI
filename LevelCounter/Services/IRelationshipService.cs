@@ -6,7 +6,7 @@ namespace LevelCounter.Services
     public interface IRelationshipService
     {
         Task<Relationship> MakeFriendRequest(string firendName, string userId);
-        Task ConfirmRequest(int relationshipId);
+        Task ConfirmRequest(int relationshipId, string userId);
         Task BlockRequest(int relationshipId);
     }
 }
