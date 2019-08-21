@@ -3,7 +3,6 @@ using HotelBookingApp.Models.DTO;
 using LevelCounter.Exceptions;
 using LevelCounter.Models;
 using LevelCounter.Models.DTO;
-using LevelCounter.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;

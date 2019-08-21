@@ -24,5 +24,22 @@ namespace LevelCounter.Services
                 .Include(s => s.ApplicationUser)
                 .SingleOrDefaultAsync(s => s.StatisticsId == user.StatisticsId) ?? throw new ItemNotFoundException();
         }
+
+        public async Task UpdateStatistics(string userId, Statistics statistics)
+        {
+            var userStat = await GetUserStatistics(userId);
+            UpdateStatisticsProperties(statistics, userStat);
+            context.Update(userStat);
+            await context.SaveChangesAsync();
+        }
+
+        private Statistics UpdateStatisticsProperties(Statistics dtoStats, Statistics userStats)
+        {
+            userStats.PlayTime = userStats.PlayTime <= dtoStats.PlayTime ? dtoStats.PlayTime : userStats.PlayTime;
+            userStats.GamesPlayed = userStats.GamesPlayed <= dtoStats.GamesPlayed ? dtoStats.GamesPlayed : userStats.GamesPlayed;
+            userStats.RoundsPlayed = userStats.RoundsPlayed <= dtoStats.RoundsPlayed ? dtoStats.RoundsPlayed : userStats.RoundsPlayed;
+            userStats.Wins = userStats.Wins <= dtoStats.Wins ? dtoStats.Wins : userStats.Wins;
+            return userStats;
+        }
     }
 }

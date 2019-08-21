@@ -1,4 +1,5 @@
 ﻿using LevelCounter.Exceptions;
+using LevelCounter.Models;
 using LevelCounter.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -29,10 +30,20 @@ namespace LevelCounter.Controllers
             {
                 var statistics = await statisticsService.GetUserStatistics(userId);
                 return Ok(statistics);
-            } catch (ItemNotFoundException e)
+            }
+            catch (ItemNotFoundException e)
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateStatistics([FromBody] Statistics statistics)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await statisticsService.UpdateStatistics(userId, statistics);
+            return Ok("Statistics saved");
         }
     }
 }
