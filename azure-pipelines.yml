@@ -33,7 +33,6 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-steps:
 - task: DotNetCoreCLI@2
   displayName: Publish
   inputs:
@@ -41,7 +40,6 @@ steps:
     publishWebProjects: True
     arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
 
-steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
