@@ -95,7 +95,7 @@ namespace LevelCounter.Services
             return errors;
         }
 
-        public async Task<List<string>> SignUpAsync(SignupRequest request)
+        public async Task<SignUpResponse> SignUpAsync(SignupRequest request)
         {
             var user = mapper.Map<ApplicationUser>(request);
             var result = await userManager.CreateAsync(user, request.Password);
@@ -105,9 +105,12 @@ namespace LevelCounter.Services
                 await userManager.AddToRoleAsync(user, DEFAULT_ROLE);
                 await signInManager.SignInAsync(user, isPersistent: false);
             }
-            return result.Errors
+            return new SignUpResponse
+            {
+                Errors = result.Errors
                 .Select(e => e.Description)
-                .ToList();
+                .ToList()
+            };
         }
 
         public async Task<List<string>> UpdateAsync(string userId, UserEditRequest userEditRequest)
@@ -170,7 +173,7 @@ namespace LevelCounter.Services
 
         public ApplicationUser FindUserByName(string name)
         {
-            return context.Users.FirstOrDefault(u => u.UserName == name) 
+            return context.Users.FirstOrDefault(u => u.UserName == name)
                 ?? throw new ItemNotFoundException();
         }
     }

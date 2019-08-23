@@ -31,7 +31,7 @@ namespace LevelCounter.Exceptions
         public async Task<IActionResult> SignUp([FromBody] SignupRequest signUpRequest)
         {
             var errors = await accountService.SignUpAsync(signUpRequest);
-            if (errors.Count == 0)
+            if (errors.Errors.Count == 0)
             {
                 return new ObjectResult(errors)
                 {
