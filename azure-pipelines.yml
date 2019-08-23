@@ -16,11 +16,26 @@ variables:
 
 steps:
 - task: DotNetCoreCLI@2
+  displayName: Restore
   inputs:
     command: 'restore'
     projects: '**/*.sln'
 
 - task: DotNetCoreCLI@2
+  displayName: Build
   inputs:
     command: 'build'
     projects: '**/*.sln'
+    arguments: '--configuration Release'
+
+- task: DotNetCoreCLI@2
+  displayName: Publish
+  inputs:
+    command: publish
+    publishWebProjects: True
+    arguments: '--configuration Release --output $(build.artifactstagingdirectory)'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)'
