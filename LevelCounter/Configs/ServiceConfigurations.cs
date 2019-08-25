@@ -27,7 +27,7 @@ namespace LevelCounter.Configs
             var connectionString = isProduction ? "ProductionConnection" : "DefaultConnection";
 
             services.AddDbContext<ApplicationContext>(opt =>
-                opt.UseSqlServer(config.GetConnectionString(connectionString)));
+                opt.UseMySql(config.GetConnectionString(connectionString)));
             return services;
         }
 

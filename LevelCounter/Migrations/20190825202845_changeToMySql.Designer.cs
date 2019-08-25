@@ -3,23 +3,21 @@ using System;
 using LevelCounter.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LevelCounter.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20190821100410_fixGender2")]
-    partial class fixGender2
+    [Migration("20190825202845_changeToMySql")]
+    partial class changeToMySql
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.1.11-servicing-32099")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("LevelCounter.Models.ApplicationUser", b =>
                 {
@@ -40,6 +38,8 @@ namespace LevelCounter.Migrations
                         .IsRequired();
 
                     b.Property<int>("Gender");
+
+                    b.Property<bool>("IsPublic");
 
                     b.Property<bool>("LockoutEnabled");
 
@@ -78,8 +78,7 @@ namespace LevelCounter.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+                        .HasName("UserNameIndex");
 
                     b.HasIndex("StatisticsId")
                         .IsUnique();
@@ -87,11 +86,32 @@ namespace LevelCounter.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("LevelCounter.Models.Relationship", b =>
+                {
+                    b.Property<int>("RelationshipId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("RelatingUserId");
+
+                    b.Property<int>("RelationshipState");
+
+                    b.Property<string>("State");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("RelationshipId");
+
+                    b.HasIndex("RelatingUserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Relationships");
+                });
+
             modelBuilder.Entity("LevelCounter.Models.Statistics", b =>
                 {
                     b.Property<int>("StatisticsId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("GamesPlayed");
 
@@ -124,8 +144,7 @@ namespace LevelCounter.Migrations
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .HasName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles");
                 });
@@ -133,8 +152,7 @@ namespace LevelCounter.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("ClaimType");
 
@@ -153,8 +171,7 @@ namespace LevelCounter.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("ClaimType");
 
@@ -222,6 +239,17 @@ namespace LevelCounter.Migrations
                         .WithOne("ApplicationUser")
                         .HasForeignKey("LevelCounter.Models.ApplicationUser", "StatisticsId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("LevelCounter.Models.Relationship", b =>
+                {
+                    b.HasOne("LevelCounter.Models.ApplicationUser", "RelatingUser")
+                        .WithMany()
+                        .HasForeignKey("RelatingUserId");
+
+                    b.HasOne("LevelCounter.Models.ApplicationUser", "User")
+                        .WithMany("Relationships")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

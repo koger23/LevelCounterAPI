@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LevelCounter.Migrations
 {
-    public partial class init : Migration
+    public partial class changeToMySql : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -27,12 +27,11 @@ namespace LevelCounter.Migrations
                 columns: table => new
                 {
                     StatisticsId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Wins = table.Column<int>(nullable: false),
                     GamesPlayed = table.Column<int>(nullable: false),
                     RoundsPlayed = table.Column<int>(nullable: false),
-                    PlayTime = table.Column<long>(nullable: false),
-                    UserId = table.Column<int>(nullable: false)
+                    PlayTime = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -44,7 +43,7 @@ namespace LevelCounter.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     RoleId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true)
@@ -79,9 +78,12 @@ namespace LevelCounter.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
-                    Sex = table.Column<int>(nullable: false),
+                    FullName = table.Column<string>(nullable: false),
+                    Sex = table.Column<string>(nullable: false),
+                    Gender = table.Column<int>(nullable: false),
                     StatisticsId = table.Column<int>(nullable: false),
-                    RegisterDate = table.Column<DateTime>(nullable: false)
+                    RegisterDate = table.Column<DateTime>(nullable: false),
+                    IsPublic = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -99,7 +101,7 @@ namespace LevelCounter.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
                     ClaimValue = table.Column<string>(nullable: true)
@@ -179,6 +181,34 @@ namespace LevelCounter.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Relationships",
+                columns: table => new
+                {
+                    RelationshipId = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<string>(nullable: true),
+                    RelatingUserId = table.Column<string>(nullable: true),
+                    State = table.Column<string>(nullable: true),
+                    RelationshipState = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Relationships", x => x.RelationshipId);
+                    table.ForeignKey(
+                        name: "FK_Relationships_AspNetUsers_RelatingUserId",
+                        column: x => x.RelatingUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Relationships_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -188,8 +218,7 @@ namespace LevelCounter.Migrations
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
-                unique: true,
-                filter: "[NormalizedName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
@@ -215,14 +244,23 @@ namespace LevelCounter.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true,
-                filter: "[NormalizedUserName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_StatisticsId",
                 table: "AspNetUsers",
                 column: "StatisticsId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Relationships_RelatingUserId",
+                table: "Relationships",
+                column: "RelatingUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Relationships_UserId",
+                table: "Relationships",
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -241,6 +279,9 @@ namespace LevelCounter.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Relationships");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
