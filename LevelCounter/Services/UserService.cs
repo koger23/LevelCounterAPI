@@ -1,4 +1,6 @@
-﻿using LevelCounter.Models;
+﻿using AutoMapper;
+using LevelCounter.Models;
+using LevelCounter.Models.DTO;
 using LevelCounter.Repository;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
@@ -11,21 +13,44 @@ namespace LevelCounter.Services
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly ApplicationContext context;
+        private readonly IMapper mapper;
 
-        public UserService(UserManager<ApplicationUser> userManager, ApplicationContext context)
+        public UserService(UserManager<ApplicationUser> userManager, ApplicationContext context, IMapper mapper)
         {
             this.userManager = userManager;
             this.context = context;
+            this.mapper = mapper;
         }
 
-        public async Task<List<Relationship>> GetFriendsAsync(string userId)
+        public async Task<List<UserShortResponse>> GetFriendsAsync(string userId)
         {
             var user = await userManager.FindByIdAsync(userId);
-            var friends = context.Relationships
+            var relationships = context.Relationships
                 .Where(r => r.RelationshipState == Relationship.RelationshipStates.CONFIRMED)
                 .Where(r => r.RelatingUserId == user.Id || r.UserId == user.Id)
                 .ToList();
-            return friends;
+            return GetUserShortResponseFromRelationshipList(relationships, userId);
+        }
+
+        private List<UserShortResponse> GetUserShortResponseFromRelationshipList(List<Relationship> relationships, string userId)
+        {
+            var shortResponses = new List<UserShortResponse>();
+            for (int i = 0; i < relationships.Count; i++)
+            {
+                if (relationships[i].RelatingUserId == userId)
+                {
+                    shortResponses.Add(FindUserById(relationships[i].UserId));
+                } else
+                {
+                    shortResponses.Add(FindUserById(relationships[i].RelatingUserId));
+                }
+            }
+            return shortResponses;
+        }
+
+        public UserShortResponse FindUserById(string userId)
+        {
+            return mapper.Map<UserShortResponse>(context.Users.Where(u => u.Id == userId).SingleOrDefault());
         }
 
         public async Task<List<Relationship>> GetPendingRequestsAsync(string userId)
