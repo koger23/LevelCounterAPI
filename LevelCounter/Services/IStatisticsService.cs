@@ -7,5 +7,6 @@ namespace LevelCounter.Services
     {
         Task<Statistics> GetUserStatistics(string userId);
         Task UpdateStatistics(string userId, Statistics statistics);
+        Task<Statistics> GetStatisticsById(int id);
     }
 }

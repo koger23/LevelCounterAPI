@@ -2,6 +2,7 @@
 using LevelCounter.Models;
 using LevelCounter.Repository;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace LevelCounter.Services
@@ -15,6 +16,11 @@ namespace LevelCounter.Services
         {
             this.accountService = accountService;
             this.context = context;
+        }
+
+        public Task<Statistics> GetStatisticsById(int statisticId)
+        {
+            return context.Statistics.Where(s => s.StatisticsId == statisticId).SingleAsync();
         }
 
         public async Task<Statistics> GetUserStatistics(string userId)

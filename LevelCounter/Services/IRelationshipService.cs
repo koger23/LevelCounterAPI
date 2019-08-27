@@ -8,5 +8,6 @@ namespace LevelCounter.Services
         Task<Relationship> MakeFriendRequest(string firendName, string userId);
         Task ConfirmRequest(int relationshipId, string userId);
         Task BlockRequest(int relationshipId);
+        Relationship GetRelationshipByNames(string friendName, string userId);
     }
 }

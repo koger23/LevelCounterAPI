@@ -90,43 +90,44 @@ namespace LevelCounter.Exceptions
         [HttpGet("userlist")]
         public async Task<IActionResult> GetUserList()
         {
-            var users = await accountService.GetUsersAsync();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var users = await userService.GetUsersAsync(userId);
             return Ok(users);
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
         [HttpGet("friends")]
-        public async Task<IActionResult> GetFriends()
+        public IActionResult GetFriends()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await userService.GetFriendsAsync(userId);
+            var user = userService.GetFriendsAsync(userId);
             return Ok(user);
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
         [HttpGet("requests/pending")]
-        public async Task<IActionResult> GetPending()
+        public IActionResult GetPending()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await userService.GetPendingRequestsAsync(userId);
+            var user = userService.GetPendingRequests(userId);
             return Ok(user);
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
         [HttpGet("requests/blocked")]
-        public async Task<IActionResult> GetBlocked()
+        public IActionResult GetBlocked()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await userService.GetBlockedAsync(userId);
+            var user = userService.GetBlocked(userId);
             return Ok(user);
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
         [HttpGet("requests/unconfirmed")]
-        public async Task<IActionResult> GetUnconfirmed()
+        public IActionResult GetUnconfirmed()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await userService.GetUnconfirmedAsync(userId);
+            var user = userService.GetUnconfirmedAsync(userId);
             return Ok(user);
         }
 

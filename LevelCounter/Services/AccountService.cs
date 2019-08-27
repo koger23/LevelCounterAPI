@@ -5,7 +5,6 @@ using LevelCounter.Models;
 using LevelCounter.Models.DTO;
 using LevelCounter.Repository;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -163,12 +162,6 @@ namespace LevelCounter.Services
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        public async Task<List<UserShortResponse>> GetUsersAsync()
-        {
-            var users = await context.Users.Where(u => u.IsPublic).ToListAsync();
-            return mapper.Map<List<UserShortResponse>>(users);
         }
 
         public ApplicationUser FindUserByName(string name)

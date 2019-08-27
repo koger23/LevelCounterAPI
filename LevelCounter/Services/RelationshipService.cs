@@ -77,12 +77,17 @@ namespace LevelCounter.Services
             return relationship;
         }
 
-        private Relationship GetRelationshipByNames(string friendName, string userId)
+        public Relationship GetRelationshipByNames(string friendName, string userId)
         {
-            return context.Relationships
+            var relation1 = context.Relationships
                 .Where(r => r.UserId == userId)
                 .Where(r => r.RelatingUser.UserName == friendName)
                 .SingleOrDefault();
+            var relation2 = context.Relationships
+                .Where(r => r.RelatingUserId == userId)
+                .Where(r => r.User.UserName == friendName)
+                .SingleOrDefault();
+            return relation1 ?? relation2;
         }
 
         private async Task UpdateAndSaveAsync(Relationship relationship)

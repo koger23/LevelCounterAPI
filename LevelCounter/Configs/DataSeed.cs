@@ -29,7 +29,7 @@ namespace LevelCounter.Configs
             var password = "Passw0rd";
             var users = new Dictionary<string, string>
             {
-                ["admin@kogero.com"] = "Admin",
+                ["admin"] = "Admin",
             };
             foreach (var userEntry in users)
             {
@@ -38,7 +38,7 @@ namespace LevelCounter.Configs
                     var user = new ApplicationUser
                     {
                         UserName = userEntry.Key,
-                        Email = userEntry.Key,
+                        Email = "admin@kogero.com",
                         Gender = ApplicationUser.Genders.MALE,
                         Statistics = new Statistics(),
                         FullName = "Admin",

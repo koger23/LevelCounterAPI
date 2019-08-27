@@ -46,5 +46,13 @@ namespace LevelCounter.Controllers
             await statisticsService.UpdateStatistics(userId, statistics);
             return Ok("Statistics saved");
         }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetStatisticsById(int id)
+        {
+            var stat = await statisticsService.GetStatisticsById(id);
+            return Ok(stat);
+        }
     }
 }

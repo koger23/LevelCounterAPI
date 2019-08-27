@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System;
 using static LevelCounter.Models.ApplicationUser;
 
 namespace LevelCounter.Models.DTO
 {
-    public class UserResponse
+    public class UserResponse : IUserDTO
     {
         public string UserName { get; set; }
         public string FullName { get; set; }
@@ -16,5 +13,8 @@ namespace LevelCounter.Models.DTO
         public DateTime RegisterDate { get; set; }
         public int StatisticsId { get; set; }
         public string AvatarUrl { get; set; }
+        public bool IsFriend { get; set; } = false;
+        public bool IsBlocked { get; set; } = false;
+        public int? RelationShipId { get; set; }
     }
 }

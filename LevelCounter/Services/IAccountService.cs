@@ -13,7 +13,6 @@ namespace LevelCounter.Services
         Task<UserResponse> FindByIdAsync(string userId);
         Task<List<string>> UpdateAsync(string userId, UserEditRequest userEditRequest);
         Task<int> GetUserStatisticIdAsync(string userId);
-        Task<List<UserShortResponse>> GetUsersAsync();
         Task<ApplicationUser> FindUserByIdAsync(string userId);
         ApplicationUser FindUserByName(string userId);
     }

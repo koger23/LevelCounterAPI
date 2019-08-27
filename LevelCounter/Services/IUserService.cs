@@ -7,10 +7,11 @@ namespace LevelCounter.Services
 {
     public interface IUserService
     {
-        Task<List<UserShortResponse>> GetFriendsAsync(string userId);
-        Task<List<Relationship>> GetPendingRequestsAsync(string userId);
-        Task<List<Relationship>> GetUnconfirmedAsync(string userId);
-        Task<List<Relationship>> GetBlockedAsync(string userId);
+        List<UserShortResponse> GetFriendsAsync(string userId);
+        List<Relationship> GetPendingRequests(string userId);
+        List<Relationship> GetUnconfirmedAsync(string userId);
+        List<Relationship> GetBlocked(string userId);
         UserShortResponse FindUserById(string userId);
+        Task<List<IUserDTO>> GetUsersAsync(string userId);
     }
 }
