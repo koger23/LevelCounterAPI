@@ -35,5 +35,21 @@ namespace LevelCounter.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpPost("block")]
+        public async Task<IActionResult> BlockUser([FromQuery(Name = "userName")] string userName)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                await relationshipService.BlockUser(userName, userId);
+                return Ok();
+            }
+            catch (ItemNotFoundException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

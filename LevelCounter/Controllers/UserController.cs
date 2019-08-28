@@ -146,5 +146,21 @@ namespace LevelCounter.Exceptions
                 return BadRequest(e.Message);
             }
         }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpPut("requests/{relationshipId}/dismiss")]
+        public async Task<IActionResult> Dismiss(int relationshipId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                await relationshipService.DismissRequest(relationshipId);
+                return Ok("Dismissed");
+            }
+            catch (ItemNotFoundException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

@@ -2,30 +2,28 @@
 using LevelCounter.Models;
 using LevelCounter.Models.DTO;
 using LevelCounter.Repository;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static LevelCounter.Models.Relationship;
 
 namespace LevelCounter.Services
 {
     public class UserService : IUserService
     {
-        private readonly UserManager<ApplicationUser> userManager;
         private readonly ApplicationContext context;
         private readonly IMapper mapper;
         private readonly IRelationshipService relationshipService;
 
-        public UserService(UserManager<ApplicationUser> userManager, ApplicationContext context, IMapper mapper, IRelationshipService relationshipService)
+        public UserService(ApplicationContext context, IMapper mapper, IRelationshipService relationshipService)
         {
-            this.userManager = userManager;
             this.context = context;
             this.mapper = mapper;
             this.relationshipService = relationshipService;
         }
 
-        public List<UserShortResponse> GetFriendsAsync(string userId)
+        public List<IUserDTO> GetFriendsAsync(string userId)
         {
             var relationships = context.Relationships
                 .Where(r => r.RelationshipState == Relationship.RelationshipStates.CONFIRMED)
@@ -34,21 +32,57 @@ namespace LevelCounter.Services
             return GetUserShortResponseFromRelationshipList(relationships, userId);
         }
 
-        private List<UserShortResponse> GetUserShortResponseFromRelationshipList(List<Relationship> relationships, string userId)
+        private List<IUserDTO> GetUserShortResponseFromRelationshipList(List<Relationship> relationships, string userId)
         {
-            var shortResponses = new List<UserShortResponse>();
+            var shortResponses = new List<IUserDTO>();
             for (int i = 0; i < relationships.Count; i++)
-            {
-                if (relationships[i].RelatingUserId == userId)
+            {   
+                var user = new UserShortResponse();
+                var relationship = relationships[i];
+                if (relationship.RelatingUserId == userId)
                 {
-                    shortResponses.Add(FindUserById(relationships[i].UserId));
+                    var relatedUserId = relationships[i].UserId;
+                    user = FindUserById(relatedUserId);
                 }
                 else
                 {
-                    shortResponses.Add(FindUserById(relationships[i].RelatingUserId));
+                    var relatinUserId = relationships[i].RelatingUserId;
+                    user = FindUserById(relatinUserId);
                 }
+                SetBoolsBasedOnRelationshipState(relationship, user);
+                shortResponses.Add(user);
+                
             }
             return shortResponses;
+        }
+
+        private IUserDTO SetBoolsBasedOnRelationshipState(Relationship relationship, IUserDTO user)
+        {
+            var state = relationship.RelationshipState;
+            switch (state)
+            {
+                case (RelationshipStates.BLOCKED):
+                    user.IsBlocked = true;
+                    user.IsPending = false;
+                    user.IsFriend = false;
+                    break;
+                case (RelationshipStates.CONFIRMED):
+                    user.IsBlocked = false;
+                    user.IsPending = false;
+                    user.IsFriend = true;
+                    break;
+                case (RelationshipStates.PENDING):
+                    user.IsBlocked = false;
+                    user.IsPending = true;
+                    user.IsFriend = false;
+                    break;
+                case (RelationshipStates.UNKNOWN):
+                    user.IsBlocked = false;
+                    user.IsPending = false;
+                    user.IsFriend = false;
+                    break;
+            }
+            return user;
         }
 
         public UserShortResponse FindUserById(string userId)
@@ -56,13 +90,24 @@ namespace LevelCounter.Services
             return mapper.Map<UserShortResponse>(context.Users.Where(u => u.Id == userId).SingleOrDefault());
         }
 
-        public List<Relationship> GetPendingRequests(string userId)
+        public List<UserShortResponse> GetPendingRequests(string userId)
         {
+            var userShortResponses = new List<UserShortResponse>();
             var requests = context.Relationships
-                .Where(r => r.RelationshipState == Relationship.RelationshipStates.PENDING)
                 .Where(r => r.RelatingUserId == userId)
+                .Where(r => r.RelationshipState == Relationship.RelationshipStates.PENDING)
                 .ToList() ?? new List<Relationship>();
-            return requests;
+             requests.ForEach(r =>
+            {
+                var user = context.Users
+                .Where(u => u.Id == r.UserId)
+                .SingleOrDefault();
+                var userResponse = mapper.Map<UserShortResponse>(user);
+                userResponse.RelationShipId = r.RelationshipId;
+                userResponse.IsPending = true;
+                userShortResponses.Add(userResponse);
+            });
+            return userShortResponses;
         }
 
         public List<Relationship> GetUnconfirmedAsync(string userId)
@@ -112,10 +157,18 @@ namespace LevelCounter.Services
                         userDto.IsFriend = false;
                         userDto.IsBlocked = true;
                         userDto.RelationShipId = relationship.RelationshipId;
+                    }
+                    else if (relationship.RelationshipState == Relationship.RelationshipStates.PENDING)
+                    {
+                        userDto.IsFriend = false;
+                        userDto.IsBlocked = false;
+                        userDto.IsPending = true;
+                        userDto.RelationShipId = relationship.RelationshipId;
                     } else
                     {
                         userDto.IsFriend = false;
                         userDto.IsBlocked = false;
+                        userDto.IsPending = false;
                         userDto.RelationShipId = null;
                     }
                 }

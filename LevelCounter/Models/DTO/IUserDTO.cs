@@ -8,5 +8,6 @@
         int? RelationShipId { get; set; }
         bool IsFriend { get; set; }
         bool IsBlocked { get;set; }
+        bool IsPending { get;set; }
     }
 }

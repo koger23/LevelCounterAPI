@@ -22,7 +22,7 @@ namespace LevelCounter.Services
             var user = await accountService.FindUserByIdAsync(userId);
             var friend = accountService.FindUserByName(friendName);
             var existingRelationship = GetRelationshipByNames(friendName, userId);
-            if (CheckRelationshipCanBePending(existingRelationship))
+            if (existingRelationship != null)
             {
                 existingRelationship.RelationshipState = Relationship.RelationshipStates.PENDING;
                 await UpdateAndSaveAsync(existingRelationship);
@@ -53,15 +53,6 @@ namespace LevelCounter.Services
             var relationship = GetRelationshipById(relationshipId);
             relationship.RelationshipState = Relationship.RelationshipStates.UNKNOWN;
             await UpdateAndSaveAsync(relationship);
-        }
-
-        private bool CheckRelationshipCanBePending(Relationship relationship)
-        {
-            if (relationship != null && relationship.RelationshipState != Relationship.RelationshipStates.BLOCKED)
-            {
-                return true;
-            }
-            return false;
         }
 
         private async Task<Relationship> CreateNewRelationship(ApplicationUser requester, ApplicationUser friend)
@@ -101,6 +92,14 @@ namespace LevelCounter.Services
             return context.Relationships
                 .Where(r => r.RelationshipId == relationshipId)
                 .SingleOrDefault() ?? throw new ItemNotFoundException();
+        }
+
+        public async Task BlockUser(string userName, string userId)
+        {
+            var relationship = GetRelationshipByNames(userName, userId) ?? throw new ItemNotFoundException();
+            relationship.RelationshipState = Relationship.RelationshipStates.BLOCKED;
+            context.Relationships.Update(relationship);
+            await context.SaveChangesAsync();
         }
     }
 }
