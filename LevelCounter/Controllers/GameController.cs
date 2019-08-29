@@ -1,8 +1,14 @@
-﻿using LevelCounter.Models.DTO;
+﻿using LevelCounter.Exceptions;
+using LevelCounter.Models.DTO;
+using LevelCounter.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net.WebSockets;
+using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +19,14 @@ namespace LevelCounter.Controllers
     [ApiController]
     public class GameController : ControllerBase
     {
+        private const string authScheme = JwtBearerDefaults.AuthenticationScheme;
+        private readonly IGameService gameService;
+
+        public GameController(IGameService gameService)
+        {
+            this.gameService = gameService;
+        }
+
         [HttpGet]
         public async Task GetGameState([FromQuery] int gameid)
         {
@@ -31,10 +45,42 @@ namespace LevelCounter.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateNewGame([FromBody] NewGameRequest newGameRequest)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (newGameRequest.UserNames.Count > 0)
+            {
+                try
+                {
+                    var game = await gameService.CreateGame(newGameRequest, userId);
+                    return Ok(game);
+                } catch (ItemNotFoundException e)
+                {
+                    return BadRequest(e.Message);
+                }
+            } else
+            {
+                return BadRequest("Number of players must be higher than 0");
+            }
+        }
+
         private async Task GetMessages(WebSocket webSocket)
         {
-            var user = new UserShortResponse();
-            var jsonUser = JsonConvert.SerializeObject(user);
+            var objectToSend = new UserShortResponse
+            {
+                UserName = "server",
+                StatisticsId = 13
+            };
+            var objList = new List<UserShortResponse>()
+            {
+                objectToSend,
+                objectToSend,
+                objectToSend,
+                objectToSend
+            };
+            var jsonUser = JsonConvert.SerializeObject(objList);
             var bytes = Encoding.ASCII.GetBytes(jsonUser);
             var arraySegment = new ArraySegment<byte>(bytes);
             await Echo(webSocket, arraySegment);
