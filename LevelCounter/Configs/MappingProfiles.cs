@@ -16,6 +16,9 @@ namespace LevelCounter.Configs
                     .ForMember(dest => dest.FullName, opts => opts.MapFrom(src => src.FullName))
                     .ForMember(dest => dest.Statistics, opts => opts.MapFrom(src => new Statistics()));
                 mc.CreateMap<ApplicationUser, UserShortResponse>();
+                mc.CreateMap<ApplicationUser, InGameUser>()
+                .ForMember(dest => dest.UserId, opts => opts.MapFrom(src => src.Id))
+                .MaxDepth(1);
             });
         }
     }

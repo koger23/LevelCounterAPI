@@ -59,9 +59,6 @@ namespace LevelCounter.Migrations
 
                     b.Property<string>("SecurityStamp");
 
-                    b.Property<string>("Sex")
-                        .IsRequired();
-
                     b.Property<int>("StatisticsId");
 
                     b.Property<bool>("TwoFactorEnabled");
@@ -86,44 +83,38 @@ namespace LevelCounter.Migrations
 
             modelBuilder.Entity("LevelCounter.Models.Game", b =>
                 {
-                    b.Property<int>("GameId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("ApplicationUserId");
+                    b.Property<DateTime>("Datetime");
 
-                    b.Property<bool>("IsHosted");
+                    b.Property<string>("HostingUserId");
+
+                    b.Property<bool>("IsRunning");
 
                     b.Property<long>("Time");
 
-                    b.HasKey("GameId");
-
-                    b.HasIndex("ApplicationUserId");
+                    b.HasKey("Id");
 
                     b.ToTable("Games");
                 });
 
             modelBuilder.Entity("LevelCounter.Models.InGameUser", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("InGameUserId")
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("Bonus");
 
                     b.Property<int>("GameId");
 
-                    b.Property<int>("Gender");
-
                     b.Property<int>("Level");
 
-                    b.Property<string>("Sex");
+                    b.Property<string>("UserId");
 
-                    b.Property<string>("UserId")
-                        .IsRequired();
+                    b.Property<string>("UserName");
 
-                    b.Property<string>("UserName")
-                        .IsRequired();
-
-                    b.HasKey("Id");
+                    b.HasKey("InGameUserId");
 
                     b.HasIndex("GameId");
 
@@ -285,16 +276,9 @@ namespace LevelCounter.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("LevelCounter.Models.Game", b =>
-                {
-                    b.HasOne("LevelCounter.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("Games")
-                        .HasForeignKey("ApplicationUserId");
-                });
-
             modelBuilder.Entity("LevelCounter.Models.InGameUser", b =>
                 {
-                    b.HasOne("LevelCounter.Models.Game", "Game")
+                    b.HasOne("LevelCounter.Models.Game")
                         .WithMany("InGameUsers")
                         .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade);

@@ -23,22 +23,6 @@ namespace LevelCounter.Models
                 }
                 return "Invalid gender type";
             }
-            set
-            {
-                var word = value.ToLower();
-                switch (word)
-                {
-                    case ("female"):
-                        Gender = Genders.FEMALE;
-                        break;
-                    case ("male"):
-                        Gender = Genders.MALE;
-                        break;
-                    default:
-                        Gender = Genders.MALE;
-                        break;
-                }
-            }
         }
         public Genders Gender { get; set; }
         public enum Genders
@@ -53,6 +37,5 @@ namespace LevelCounter.Models
         public string AvatarUrl;
         public List<Relationship> Relationships { get; set; }
         public bool IsPublic { get; set; } = true;
-        public List<Game> Games { get; set; } = null;
     }
 }

@@ -23,12 +23,6 @@ namespace LevelCounter.Repository
             modelBuilder.Entity<ApplicationUser>()
                 .HasMany(au => au.Relationships)
                 .WithOne(r => r.User);
-            modelBuilder.Entity<ApplicationUser>()
-                .HasMany(au => au.Games)
-                .WithOne(g => g.ApplicationUser);
-            modelBuilder.Entity<Game>()
-                .HasMany(au => au.InGameUsers)
-                .WithOne(g => g.Game);
         }
     }
 }

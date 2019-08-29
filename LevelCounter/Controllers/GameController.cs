@@ -47,22 +47,68 @@ namespace LevelCounter.Controllers
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
         [HttpPost("create")]
-        public async Task<IActionResult> CreateNewGame([FromBody] NewGameRequest newGameRequest)
+        public async Task<IActionResult> CreateNewGame()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                return new ObjectResult(await gameService.CreateGame(userId))
+                {
+                    StatusCode = 201
+                };
+            }
+            catch (ItemNotFoundException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (FormatException e)
+            {
+                return BadRequest(e.Message);
+            }
+
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpPost("addInGameUsers")]
+        public async Task<IActionResult> AddInGameUsers([FromBody] NewGameRequest newGameRequest)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (newGameRequest.UserNames.Count > 0)
             {
                 try
                 {
-                    var game = await gameService.CreateGame(newGameRequest, userId);
-                    return Ok(game);
-                } catch (ItemNotFoundException e)
+                    return new ObjectResult(await gameService.AddInGameUsers(newGameRequest, userId))
+                    {
+                        StatusCode = 201
+                    };
+                }
+                catch (ItemNotFoundException e)
                 {
                     return BadRequest(e.Message);
                 }
-            } else
+                catch (FormatException e)
+                {
+                    return BadRequest(e.Message);
+                }
+            }
+            else
             {
                 return BadRequest("Number of players must be higher than 0");
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpPost("updateInGameUser")]
+        public async Task<IActionResult> UpdateInGameUser([FromBody] UpdateInGameUserRequest updateInGameUserRequest)
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                await gameService.UpdateInGameUserAsync(updateInGameUserRequest, userId);
+                return Ok("User updated");
+            } catch (ItemNotFoundException e)
+            {
+                return BadRequest(e.Message);
             }
         }
 
@@ -75,9 +121,6 @@ namespace LevelCounter.Controllers
             };
             var objList = new List<UserShortResponse>()
             {
-                objectToSend,
-                objectToSend,
-                objectToSend,
                 objectToSend
             };
             var jsonUser = JsonConvert.SerializeObject(objList);
