@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LevelCounter.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20190825202845_changeToMySql")]
-    partial class changeToMySql
+    [Migration("20190829140841_addGame")]
+    partial class addGame
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -84,6 +84,56 @@ namespace LevelCounter.Migrations
                         .IsUnique();
 
                     b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("LevelCounter.Models.Game", b =>
+                {
+                    b.Property<int>("GameId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ApplicationUserId");
+
+                    b.Property<bool>("IsHosted");
+
+                    b.Property<long>("Time");
+
+                    b.HasKey("GameId");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("Games");
+                });
+
+            modelBuilder.Entity("LevelCounter.Models.InGameUser", b =>
+                {
+                    b.Property<string>("UserId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("Bonus");
+
+                    b.Property<int>("Level");
+
+                    b.Property<string>("UserName")
+                        .IsRequired();
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("InGameUser");
+                });
+
+            modelBuilder.Entity("LevelCounter.Models.InGameUserGames", b =>
+                {
+                    b.Property<string>("InGameUserId");
+
+                    b.Property<int>("GameId");
+
+                    b.Property<int>("Id");
+
+                    b.HasKey("InGameUserId", "GameId");
+
+                    b.HasIndex("GameId");
+
+                    b.ToTable("InGameUserGames");
                 });
 
             modelBuilder.Entity("LevelCounter.Models.Relationship", b =>
@@ -238,6 +288,26 @@ namespace LevelCounter.Migrations
                     b.HasOne("LevelCounter.Models.Statistics", "Statistics")
                         .WithOne("ApplicationUser")
                         .HasForeignKey("LevelCounter.Models.ApplicationUser", "StatisticsId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("LevelCounter.Models.Game", b =>
+                {
+                    b.HasOne("LevelCounter.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Games")
+                        .HasForeignKey("ApplicationUserId");
+                });
+
+            modelBuilder.Entity("LevelCounter.Models.InGameUserGames", b =>
+                {
+                    b.HasOne("LevelCounter.Models.Game", "Game")
+                        .WithMany("InGameUserGames")
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("LevelCounter.Models.InGameUser", "InGameUser")
+                        .WithMany("InGameUserGames")
+                        .HasForeignKey("InGameUserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

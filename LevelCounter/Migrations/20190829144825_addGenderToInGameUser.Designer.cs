@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LevelCounter.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20190829120744_addgame")]
-    partial class addgame
+    [Migration("20190829144825_addGenderToInGameUser")]
+    partial class addGenderToInGameUser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -36,8 +36,6 @@ namespace LevelCounter.Migrations
 
                     b.Property<string>("FullName")
                         .IsRequired();
-
-                    b.Property<int?>("GameId");
 
                     b.Property<int>("Gender");
 
@@ -75,8 +73,6 @@ namespace LevelCounter.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GameId");
-
                     b.HasIndex("NormalizedEmail")
                         .HasName("EmailIndex");
 
@@ -97,6 +93,8 @@ namespace LevelCounter.Migrations
 
                     b.Property<string>("ApplicationUserId");
 
+                    b.Property<bool>("IsHosted");
+
                     b.Property<long>("Time");
 
                     b.HasKey("GameId");
@@ -104,6 +102,34 @@ namespace LevelCounter.Migrations
                     b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Games");
+                });
+
+            modelBuilder.Entity("LevelCounter.Models.InGameUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("Bonus");
+
+                    b.Property<int>("GameId");
+
+                    b.Property<int>("Gender");
+
+                    b.Property<int>("Level");
+
+                    b.Property<string>("Sex");
+
+                    b.Property<string>("UserId")
+                        .IsRequired();
+
+                    b.Property<string>("UserName")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.ToTable("InGameUsers");
                 });
 
             modelBuilder.Entity("LevelCounter.Models.Relationship", b =>
@@ -255,10 +281,6 @@ namespace LevelCounter.Migrations
 
             modelBuilder.Entity("LevelCounter.Models.ApplicationUser", b =>
                 {
-                    b.HasOne("LevelCounter.Models.Game")
-                        .WithMany("InGameUsers")
-                        .HasForeignKey("GameId");
-
                     b.HasOne("LevelCounter.Models.Statistics", "Statistics")
                         .WithOne("ApplicationUser")
                         .HasForeignKey("LevelCounter.Models.ApplicationUser", "StatisticsId")
@@ -270,6 +292,14 @@ namespace LevelCounter.Migrations
                     b.HasOne("LevelCounter.Models.ApplicationUser", "ApplicationUser")
                         .WithMany("Games")
                         .HasForeignKey("ApplicationUserId");
+                });
+
+            modelBuilder.Entity("LevelCounter.Models.InGameUser", b =>
+                {
+                    b.HasOne("LevelCounter.Models.Game", "Game")
+                        .WithMany("InGameUsers")
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("LevelCounter.Models.Relationship", b =>

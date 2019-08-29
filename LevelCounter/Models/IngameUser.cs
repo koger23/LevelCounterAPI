@@ -1,8 +1,16 @@
-﻿namespace LevelCounter.Models
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using static LevelCounter.Models.ApplicationUser;
+
+namespace LevelCounter.Models
 {
     public class InGameUser
     {
+        [Key]
+        public int Id { get; set; }
+        [Required]
         public string UserId { get; set; }
+        [Required]
         public string UserName { get; set; }
         public int Level
         {
@@ -33,11 +41,38 @@
                 return Level + Bonus;
             }
         }
-
-        public InGameUser()
+        public int GameId { get; set; }
+        public Game Game { get; set; }
+        public string Sex
         {
-            Bonus = 0;
-            Level = 1;
+            get
+            {
+                switch (Gender)
+                {
+                    case (Genders.MALE):
+                        return "male";
+                    case (Genders.FEMALE):
+                        return "female";
+                }
+                return "female"; ;
+            }
+            set
+            {
+                var word = value.ToLower();
+                switch (word)
+                {
+                    case ("female"):
+                        Gender = Genders.FEMALE;
+                        break;
+                    case ("male"):
+                        Gender = Genders.MALE;
+                        break;
+                    default:
+                        Gender = Genders.MALE;
+                        break;
+                }
+            }
         }
+        public Genders Gender { get; set; }
     }
 }

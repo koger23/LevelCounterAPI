@@ -17,6 +17,8 @@
   <ItemGroup>
     <Compile Remove="Migrations\20190829115022_addgame.cs" />
     <Compile Remove="Migrations\20190829115022_addgame.Designer.cs" />
+    <Compile Remove="Migrations\20190829142733_game.cs" />
+    <Compile Remove="Migrations\20190829142733_game.Designer.cs" />
   </ItemGroup>
   
   <ItemGroup>

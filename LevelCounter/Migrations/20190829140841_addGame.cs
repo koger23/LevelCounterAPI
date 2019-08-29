@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LevelCounter.Migrations
 {
-    public partial class changeToMySql : Migration
+    public partial class addGame : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -20,6 +20,20 @@ namespace LevelCounter.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InGameUser",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(nullable: false),
+                    UserName = table.Column<string>(nullable: false),
+                    Level = table.Column<int>(nullable: false),
+                    Bonus = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InGameUser", x => x.UserId);
                 });
 
             migrationBuilder.CreateTable(
@@ -182,6 +196,27 @@ namespace LevelCounter.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Games",
+                columns: table => new
+                {
+                    GameId = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Time = table.Column<long>(nullable: false),
+                    ApplicationUserId = table.Column<string>(nullable: true),
+                    IsHosted = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Games", x => x.GameId);
+                    table.ForeignKey(
+                        name: "FK_Games_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Relationships",
                 columns: table => new
                 {
@@ -207,6 +242,31 @@ namespace LevelCounter.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InGameUserGames",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false),
+                    InGameUserId = table.Column<string>(nullable: false),
+                    GameId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InGameUserGames", x => new { x.InGameUserId, x.GameId });
+                    table.ForeignKey(
+                        name: "FK_InGameUserGames_Games_GameId",
+                        column: x => x.GameId,
+                        principalTable: "Games",
+                        principalColumn: "GameId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_InGameUserGames_InGameUser_InGameUserId",
+                        column: x => x.InGameUserId,
+                        principalTable: "InGameUser",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -253,6 +313,16 @@ namespace LevelCounter.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Games_ApplicationUserId",
+                table: "Games",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InGameUserGames_GameId",
+                table: "InGameUserGames",
+                column: "GameId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Relationships_RelatingUserId",
                 table: "Relationships",
                 column: "RelatingUserId");
@@ -281,10 +351,19 @@ namespace LevelCounter.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "InGameUserGames");
+
+            migrationBuilder.DropTable(
                 name: "Relationships");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Games");
+
+            migrationBuilder.DropTable(
+                name: "InGameUser");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

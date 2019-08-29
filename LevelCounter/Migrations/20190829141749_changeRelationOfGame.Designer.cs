@@ -3,14 +3,16 @@ using System;
 using LevelCounter.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace LevelCounter.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20190829141749_changeRelationOfGame")]
+    partial class changeRelationOfGame
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,11 +113,7 @@ namespace LevelCounter.Migrations
 
                     b.Property<int>("GameId");
 
-                    b.Property<int>("Gender");
-
                     b.Property<int>("Level");
-
-                    b.Property<string>("Sex");
 
                     b.Property<string>("UserId")
                         .IsRequired();
@@ -127,7 +125,7 @@ namespace LevelCounter.Migrations
 
                     b.HasIndex("GameId");
 
-                    b.ToTable("InGameUsers");
+                    b.ToTable("InGameUser");
                 });
 
             modelBuilder.Entity("LevelCounter.Models.Relationship", b =>
