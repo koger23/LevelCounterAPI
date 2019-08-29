@@ -1,6 +1,4 @@
-﻿using LevelCounter.Models.DTO;
-using Newtonsoft.Json;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 

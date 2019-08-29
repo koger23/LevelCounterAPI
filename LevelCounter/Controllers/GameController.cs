@@ -37,7 +37,6 @@ namespace LevelCounter.Controllers
             var jsonUser = JsonConvert.SerializeObject(user);
             var bytes = Encoding.ASCII.GetBytes(jsonUser);
             var arraySegment = new ArraySegment<byte>(bytes);
-            await webSocket.SendAsync(arraySegment, WebSocketMessageType.Text, true, CancellationToken.None);
             await Echo(webSocket, arraySegment);
         }
         private async Task Echo(WebSocket webSocket, ArraySegment<byte> message)
