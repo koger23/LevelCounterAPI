@@ -9,6 +9,7 @@ namespace LevelCounter.Repository
         public virtual DbSet<Statistics> Statistics { get; set; }
         public virtual DbSet<ApplicationUser> Users { get; set; }
         public virtual DbSet<Relationship> Relationships { get; set; }
+        public virtual DbSet<Game> Games { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
@@ -21,6 +22,9 @@ namespace LevelCounter.Repository
             modelBuilder.Entity<ApplicationUser>()
                 .HasMany(au => au.Relationships)
                 .WithOne(r => r.User);
+            modelBuilder.Entity<ApplicationUser>()
+                .HasMany(au => au.Games)
+                .WithOne(g => g.ApplicationUser);
         }
     }
 }

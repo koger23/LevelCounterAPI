@@ -53,5 +53,6 @@ namespace LevelCounter.Models
         public string AvatarUrl;
         public List<Relationship> Relationships { get; set; }
         public bool IsPublic { get; set; } = true;
+        public List<Game> Games { get; set; } = null;
     }
 }

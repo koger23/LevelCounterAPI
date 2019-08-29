@@ -13,6 +13,11 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20190829115022_addgame.cs" />
+    <Compile Remove="Migrations\20190829115022_addgame.Designer.cs" />
+  </ItemGroup>
   
   <ItemGroup>
     <Folder Include="wwwroot\" />

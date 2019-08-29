@@ -1,16 +1,31 @@
-﻿using System.Collections.Generic;
-using LevelCounter.Models;
-using LevelCounter.Models.DTO;
+﻿using LevelCounter.Models;
+using LevelCounter.Repository;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace LevelCounter.Services
 {
     public class GameService : IGameService
     {
-        public Game CreateGame(List<InGameUser> inGameUsers, string userId)
+        private readonly ApplicationContext context;
+
+        public GameService(ApplicationContext context)
         {
+            this.context = context;
+        }
+
+        public Game CreateGame(List<string> userNames, string userId)
+        {
+            var inGameUsers = new List<ApplicationUser>();
+
+            foreach (var userName in userNames)
+            {
+                inGameUsers.Add(context.Users.Where(u => u.UserName == userName).SingleOrDefault());
+            }
+
             var game = new Game
             {
-                HostingUserId = userId,
+                ApplicationUserId = userId,
                 InGameUsers = inGameUsers,
                 Time = 0
             };
