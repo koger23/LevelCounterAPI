@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using LevelCounter.Exceptions;
 using LevelCounter.Models;
 using LevelCounter.Models.DTO;
@@ -126,7 +126,11 @@ namespace LevelCounter.Services
             bool result = false;
             foreach (var user in inGameUsers)
             {
-                if (user.UserId == userId) break;
+                if (user.UserId == userId)
+                {
+                    result = true;
+                    break;
+                }
             }
             return result;
         }
