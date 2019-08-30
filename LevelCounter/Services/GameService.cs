@@ -40,7 +40,7 @@ namespace LevelCounter.Services
         public async Task<Game> AddInGameUsers(NewGameRequest gameRequest, string userId)
         {
             var game = context.Games.Where(g => g.Id == gameRequest.gameId).SingleOrDefault();
-            if (game != null)
+            if (game != null && game.HostingUserId == userId)
             {
                 await CreateInGameUsersBasedOnUserName(gameRequest.UserNames, game);
                 context.Update(game);
