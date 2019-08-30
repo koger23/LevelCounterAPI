@@ -9,6 +9,8 @@ namespace LevelCounter.Repository
         public virtual DbSet<Statistics> Statistics { get; set; }
         public virtual DbSet<ApplicationUser> Users { get; set; }
         public virtual DbSet<Relationship> Relationships { get; set; }
+        public virtual DbSet<Game> Games { get; set; }
+        public virtual DbSet<InGameUser> InGameUsers { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {

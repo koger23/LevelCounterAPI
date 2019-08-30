@@ -68,6 +68,7 @@ namespace LevelCounter.Configs
             services.AddScoped<IStatisticsService, StatisticsService>();
             services.AddScoped<IRelationshipService, RelationshipService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IGameService, GameService>();
             return services;
         }
 

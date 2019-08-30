@@ -151,7 +151,6 @@ namespace LevelCounter.Exceptions
         [HttpPut("requests/{relationshipId}/dismiss")]
         public async Task<IActionResult> Dismiss(int relationshipId)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             try
             {
                 await relationshipService.DismissRequest(relationshipId);
