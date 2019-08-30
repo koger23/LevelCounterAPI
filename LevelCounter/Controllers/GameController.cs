@@ -4,13 +4,8 @@ using LevelCounter.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Net.WebSockets;
 using System.Security.Claims;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace LevelCounter.Controllers
@@ -28,14 +23,22 @@ namespace LevelCounter.Controllers
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
-        [HttpGet("gameState")]
-        public async Task GetGameState([FromQuery] int gameid, string userid)
+        [HttpGet("startGame")]
+        public async Task<IActionResult> StartGame([FromQuery] int gameId)
         {
-            var appUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (appUserId == userid)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (gameService.CheckHostId(gameId, userId))
             {
-
+                try
+                {
+                    return Ok(await gameService.StartGameAsync(gameId, userId));
+                }
+                catch (ItemNotFoundException e)
+                {
+                    return BadRequest(e.Message);
+                }
             }
+            return Forbid();
 
         }
 
@@ -83,6 +86,10 @@ namespace LevelCounter.Controllers
                 {
                     return BadRequest(e.Message);
                 }
+                catch (HostMisMatchException e)
+                {
+                    return Forbid(e.Message);
+                }
             }
             else
             {
@@ -99,9 +106,53 @@ namespace LevelCounter.Controllers
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 await gameService.UpdateInGameUserAsync(updateInGameUserRequest, userId);
                 return Ok("User updated");
-            } catch (ItemNotFoundException e)
+            }
+            catch (ItemNotFoundException e)
             {
                 return BadRequest(e.Message);
+            }
+            catch (HostMisMatchException e)
+            {
+                return Forbid(e.Message);
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpGet("quitGame")]
+        public async Task<IActionResult> QuitGame([FromQuery] int gameId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (gameService.CheckHostId(gameId, userId))
+            {
+                try
+                {
+                    return Ok(await gameService.QuitGameAsync(gameId, userId));
+                }
+                catch (ItemNotFoundException e)
+                {
+                    return BadRequest(e.Message);
+                }
+            }
+            return Forbid();
+
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpGet("loadGame")]
+        public async Task<IActionResult> LoadGame([FromQuery] int gameId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                return Ok(await gameService.LoadGameAsync(gameId, userId));
+            }
+            catch (ItemNotFoundException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (MissingInGameUserException e)
+            {
+                return Forbid(e.Message);
             }
         }
     }
