@@ -155,5 +155,25 @@ namespace LevelCounter.Controllers
                 return Forbid(e.Message);
             }
         }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpDelete("delete")]
+        public async Task<IActionResult> DeleteGame([FromQuery] int gameId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                await gameService.DeleteGameAsync(gameId, userId);
+                return NoContent();
+            }
+            catch (ItemNotFoundException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (HostMisMatchException e)
+            {
+                return Forbid(e.Message);
+            }
+        }
     }
 }

@@ -147,5 +147,13 @@ namespace LevelCounter.Services
             var game = context.Games.Where(g => g.Id == gameId).SingleOrDefault() ?? throw new ItemNotFoundException();
             return game.HostingUserId == userId ? true : false;
         }
+
+        public async Task DeleteGameAsync(int gameId, string userId)
+        {
+            var game = context.Games.Where(g => g.Id == gameId).SingleOrDefault() ?? throw new ItemNotFoundException();
+            if (game.HostingUserId != userId) throw new HostMisMatchException();
+            context.Games.Remove(game);
+            await context.SaveChangesAsync();
+        }
     }
 }
