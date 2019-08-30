@@ -23,7 +23,7 @@ namespace LevelCounter.Controllers
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
-        [HttpGet("startGame")]
+        [HttpPost("startGame")]
         public async Task<IActionResult> StartGame([FromQuery] int gameId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
