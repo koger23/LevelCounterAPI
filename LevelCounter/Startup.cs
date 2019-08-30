@@ -1,7 +1,6 @@
 ﻿using LevelCounter.Configs;
 using LevelCounter.Models;
 using LevelCounter.Repository;
-using LevelCounter.WebSockets;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -28,7 +27,6 @@ namespace LevelCounter
             services.AddAuthenticationConfiguration(Configuration);
             services.AddSwaggerDoc();
             services.RegisterServices();
-            services.AddWebSocketManager();
             services.AddMvcConfiguration();
         }
 
@@ -43,8 +41,6 @@ namespace LevelCounter
                 applicationContext.Database.Migrate();
                 app.UseHsts();
             }
-
-            app.UseWebSockets();
             app.UseHttpsRedirection();
             app.UseAuthentication();
             DataSeed.SeedDefaultDatas(roleManager, userManager);

@@ -27,25 +27,18 @@ namespace LevelCounter.Controllers
             this.gameService = gameService;
         }
 
-        [HttpGet]
-        public async Task GetGameState([FromQuery] int gameid)
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpGet("gameState")]
+        public async Task GetGameState([FromQuery] int gameid, string userid)
         {
-            var context = ControllerContext.HttpContext;
-            var isSocketRequest = context.WebSockets.IsWebSocketRequest;
+            var appUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (appUserId == userid)
+            {
 
-            if (isSocketRequest)
-            {
-                WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                Console.WriteLine(gameid);
-                await GetMessages(webSocket);
             }
-            else
-            {
-                context.Response.StatusCode = 400;
-            }
+
         }
 
-        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateNewGame()
         {
@@ -110,35 +103,6 @@ namespace LevelCounter.Controllers
             {
                 return BadRequest(e.Message);
             }
-        }
-
-        private async Task GetMessages(WebSocket webSocket)
-        {
-            var objectToSend = new UserShortResponse
-            {
-                UserName = "server",
-                StatisticsId = 13
-            };
-            var objList = new List<UserShortResponse>()
-            {
-                objectToSend
-            };
-            var jsonUser = JsonConvert.SerializeObject(objList);
-            var bytes = Encoding.ASCII.GetBytes(jsonUser);
-            var arraySegment = new ArraySegment<byte>(bytes);
-            await Echo(webSocket, arraySegment);
-        }
-        private async Task Echo(WebSocket webSocket, ArraySegment<byte> message)
-        {
-            var buffer = new byte[1024 * 4];
-            WebSocketReceiveResult result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-
-            while (!result.CloseStatus.HasValue)
-            {
-                await webSocket.SendAsync(message, result.MessageType, result.EndOfMessage, CancellationToken.None);
-                result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            }
-            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
         }
     }
 }
