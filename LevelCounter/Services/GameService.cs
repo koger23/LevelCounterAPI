@@ -33,6 +33,7 @@ namespace LevelCounter.Services
 
         public async Task<Game> AddInGameUsersAsync(NewGameRequest gameRequest, string userId)
         {
+            gameRequest.UserNames.Add(context.Users.Where(u => u.Id == userId).SingleOrDefault().UserName);
             var game = context.Games.Where(g => g.Id == gameRequest.gameId).SingleOrDefault() ?? throw new ItemNotFoundException();
             if (game.HostingUserId == userId)
             {
