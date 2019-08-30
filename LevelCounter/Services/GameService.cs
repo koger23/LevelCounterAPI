@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using LevelCounter.Exceptions;
 using LevelCounter.Models;
 using LevelCounter.Models.DTO;
@@ -56,7 +56,8 @@ namespace LevelCounter.Services
                 inGameUser.Bonus = updateInGameUserRequest.Bonus <= 0 ? 0 : updateInGameUserRequest.Bonus;
                 context.InGameUsers.Update(inGameUser);
                 await context.SaveChangesAsync();
-            } else
+            }
+            else
             {
                 throw new HostMisMatchException();
             }
@@ -116,9 +117,12 @@ namespace LevelCounter.Services
                 ?? throw new ItemNotFoundException();
             if (CheckInGameUserInGameExists(game.InGameUsers, userId))
             {
+                game.IsRunning = true;
+                context.Games.Update(game);
+                await context.SaveChangesAsync();
                 return game;
             }
-            throw new  MissingInGameUserException();
+            throw new MissingInGameUserException();
         }
 
         private bool CheckInGameUserInGameExists(List<InGameUser> inGameUsers, string userId)
@@ -158,6 +162,35 @@ namespace LevelCounter.Services
             if (game.HostingUserId != userId) throw new HostMisMatchException();
             context.Games.Remove(game);
             await context.SaveChangesAsync();
+        }
+
+        public async Task<List<Game>> GetHostedGames(string userId)
+        {
+            var games = await Task.Run(() =>
+            {
+                return context.Games
+                .Include(g => g.InGameUsers)
+                .Where(g => g.HostingUserId == userId)
+                .Where(g => CheckInGameUserInGameExists(g.InGameUsers, userId))
+                .ToList()
+                ?? throw new ItemNotFoundException();
+            });
+            return games;
+        }
+
+        public async Task<List<Game>> GetRelatedGames(string userId)
+        {
+            var games = await Task.Run(() =>
+            {
+                return context.Games
+                .Include(g => g.InGameUsers)
+                .Where(g => g.HostingUserId != userId)
+                .Where(g => g.IsRunning == true)
+                .Where(g => CheckInGameUserInGameExists(g.InGameUsers, userId))
+                .ToList()
+                ?? throw new ItemNotFoundException();
+            });
+            return games;
         }
     }
 }

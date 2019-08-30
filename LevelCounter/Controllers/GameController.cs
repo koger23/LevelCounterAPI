@@ -38,7 +38,7 @@ namespace LevelCounter.Controllers
                     return BadRequest(e.Message);
                 }
             }
-            return Forbid();
+            return BadRequest();
 
         }
 
@@ -88,7 +88,7 @@ namespace LevelCounter.Controllers
                 }
                 catch (HostMisMatchException e)
                 {
-                    return Forbid(e.Message);
+                    return BadRequest(e.Message);
                 }
             }
             else
@@ -113,7 +113,7 @@ namespace LevelCounter.Controllers
             }
             catch (HostMisMatchException e)
             {
-                return Forbid(e.Message);
+                return BadRequest(e.Message);
             }
         }
 
@@ -133,7 +133,7 @@ namespace LevelCounter.Controllers
                     return BadRequest(e.Message);
                 }
             }
-            return Forbid();
+            return BadRequest();
 
         }
 
@@ -150,9 +150,9 @@ namespace LevelCounter.Controllers
             {
                 return BadRequest(e.Message);
             }
-            catch (MissingInGameUserException e)
+            catch (MissingInGameUserException)
             {
-                return Forbid(e.Message);
+                return NoContent();
             }
         }
 
@@ -172,8 +172,24 @@ namespace LevelCounter.Controllers
             }
             catch (HostMisMatchException e)
             {
-                return Forbid(e.Message);
+                return BadRequest(e.Message);
             }
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpGet("savedGames")]
+        public async Task<IActionResult> ListSavedGames()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return Ok(await gameService.GetHostedGames(userId));
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpGet("joinableGames")]
+        public async Task<IActionResult> ListJoinableGames()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return Ok(await gameService.GetRelatedGames(userId));
         }
     }
 }

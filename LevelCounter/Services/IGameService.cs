@@ -16,5 +16,7 @@ namespace LevelCounter.Services
         Task<Game> QuitGameAsync(int gameId, string userId);
         bool CheckHostId(int gameId, string userId);
         Task DeleteGameAsync(int gameId, string userId);
+        Task<List<Game>> GetHostedGames(string userId);
+        Task<List<Game>> GetRelatedGames(string userId);
     }
 }
