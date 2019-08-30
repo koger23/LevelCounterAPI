@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LevelCounter.Models
 {
@@ -9,7 +10,7 @@ namespace LevelCounter.Models
     {
         [Required]
         public string FullName { get; set; }
-        [Required]
+        [NotMapped]
         public string Sex
         {
             get

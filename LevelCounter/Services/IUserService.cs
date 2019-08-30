@@ -8,6 +8,7 @@ namespace LevelCounter.Services
     public interface IUserService
     {
         List<IUserDTO> GetFriendsAsync(string userId);
+        List<IUserDTO> GetFriendsForGameAsync(string userId);
         List<UserShortResponse> GetPendingRequests(string userId);
         List<Relationship> GetUnconfirmedAsync(string userId);
         List<Relationship> GetBlocked(string userId);

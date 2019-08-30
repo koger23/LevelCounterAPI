@@ -26,7 +26,7 @@ namespace LevelCounter.Services
         public List<IUserDTO> GetFriendsAsync(string userId)
         {
             var relationships = context.Relationships
-                .Where(r => r.RelationshipState == Relationship.RelationshipStates.CONFIRMED)
+                .Where(r => r.RelationshipState == RelationshipStates.CONFIRMED)
                 .Where(r => r.RelatingUserId == userId || r.UserId == userId)
                 .ToList();
             return GetUserShortResponseFromRelationshipList(relationships, userId);
@@ -46,12 +46,11 @@ namespace LevelCounter.Services
                 }
                 else
                 {
-                    var relatinUserId = relationships[i].RelatingUserId;
-                    user = FindUserById(relatinUserId);
+                    var relatingUserId = relationships[i].RelatingUserId;
+                    user = FindUserById(relatingUserId);
                 }
                 SetBoolsBasedOnRelationshipState(relationship, user);
                 shortResponses.Add(user);
-                
             }
             return shortResponses;
         }
@@ -95,7 +94,7 @@ namespace LevelCounter.Services
             var userShortResponses = new List<UserShortResponse>();
             var requests = context.Relationships
                 .Where(r => r.RelatingUserId == userId)
-                .Where(r => r.RelationshipState == Relationship.RelationshipStates.PENDING)
+                .Where(r => r.RelationshipState == RelationshipStates.PENDING)
                 .ToList() ?? new List<Relationship>();
              requests.ForEach(r =>
             {
@@ -113,7 +112,7 @@ namespace LevelCounter.Services
         public List<Relationship> GetUnconfirmedAsync(string userId)
         {
             var requests = context.Relationships
-                .Where(r => r.RelationshipState == Relationship.RelationshipStates.PENDING)
+                .Where(r => r.RelationshipState == RelationshipStates.PENDING)
                 .Where(r => r.UserId == userId)
                 .ToList() ?? new List<Relationship>();
             return requests;
@@ -122,7 +121,7 @@ namespace LevelCounter.Services
         public List<Relationship> GetBlocked(string userId)
         {
             var requests = context.Relationships
-                .Where(r => r.RelationshipState == Relationship.RelationshipStates.BLOCKED)
+                .Where(r => r.RelationshipState == RelationshipStates.BLOCKED)
                 .Where(r => r.UserId == userId)
                 .ToList() ?? new List<Relationship>();
             return requests;
@@ -146,19 +145,19 @@ namespace LevelCounter.Services
                 var relationship = relationshipService.GetRelationshipByNames(userDto.UserName, userId);
                 if (relationship != null)
                 {
-                    if (relationship.RelationshipState == Relationship.RelationshipStates.CONFIRMED)
+                    if (relationship.RelationshipState == RelationshipStates.CONFIRMED)
                     {
                         userDto.IsFriend = true;
                         userDto.IsBlocked = false;
                         userDto.RelationShipId = relationship.RelationshipId;
                     }
-                    else if (relationship.RelationshipState == Relationship.RelationshipStates.BLOCKED)
+                    else if (relationship.RelationshipState == RelationshipStates.BLOCKED)
                     {
                         userDto.IsFriend = false;
                         userDto.IsBlocked = true;
                         userDto.RelationShipId = relationship.RelationshipId;
                     }
-                    else if (relationship.RelationshipState == Relationship.RelationshipStates.PENDING)
+                    else if (relationship.RelationshipState == RelationshipStates.PENDING)
                     {
                         userDto.IsFriend = false;
                         userDto.IsBlocked = false;
