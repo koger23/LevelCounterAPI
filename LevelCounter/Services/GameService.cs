@@ -13,12 +13,10 @@ namespace LevelCounter.Services
     public class GameService : IGameService
     {
         private readonly ApplicationContext context;
-        private readonly IMapper mapper;
 
-        public GameService(ApplicationContext context, IMapper mapper)
+        public GameService(ApplicationContext context)
         {
             this.context = context;
-            this.mapper = mapper;
         }
 
         public async Task<Game> CreateGameAsync(string userId)
@@ -76,7 +74,8 @@ namespace LevelCounter.Services
                     {
                         UserId = user.Id,
                         UserName = user.UserName,
-                        GameId = game.Id
+                        GameId = game.Id,
+                        Gender = user.Gender
                     };
                     users.Add(inGameUser);
                     await context.InGameUsers.AddAsync(inGameUser);

@@ -11,6 +11,7 @@ namespace LevelCounter.Models
         public int Level { get; set; }
         public int Bonus { get; set; }
         public int GameId { get; set; }
+        public ApplicationUser.Genders Gender { get; set; } = ApplicationUser.Genders.MALE;
         public InGameUser()
         {
             Level = 1;
