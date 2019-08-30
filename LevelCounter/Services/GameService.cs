@@ -3,6 +3,7 @@ using LevelCounter.Exceptions;
 using LevelCounter.Models;
 using LevelCounter.Models.DTO;
 using LevelCounter.Repository;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,11 +23,7 @@ namespace LevelCounter.Services
 
         public async Task<Game> CreateGameAsync(string userId)
         {
-            var user = context.Users.Where(u => u.Id == userId).SingleOrDefault();
-            if (user == null)
-            {
-                throw new ItemNotFoundException();
-            }
+            var user = context.Users.Where(u => u.Id == userId).SingleOrDefault() ?? throw new ItemNotFoundException();
             var game = new Game
             {
                 HostingUserId = userId
@@ -38,15 +35,15 @@ namespace LevelCounter.Services
 
         public async Task<Game> AddInGameUsersAsync(NewGameRequest gameRequest, string userId)
         {
-            var game = context.Games.Where(g => g.Id == gameRequest.gameId).SingleOrDefault();
-            if (game != null && game.HostingUserId == userId)
+            var game = context.Games.Where(g => g.Id == gameRequest.gameId).SingleOrDefault() ?? throw new ItemNotFoundException();
+            if (game.HostingUserId == userId)
             {
                 await CreateInGameUsersBasedOnUserNameAsync(gameRequest.UserNames, game);
                 context.Update(game);
                 await context.SaveChangesAsync();
                 return game;
             }
-            throw new ItemNotFoundException();
+            throw new HostMisMatchException();
         }
 
         public async Task UpdateInGameUserAsync(UpdateInGameUserRequest updateInGameUserRequest, string userId)
@@ -59,6 +56,9 @@ namespace LevelCounter.Services
                 inGameUser.Bonus = updateInGameUserRequest.Bonus <= 0 ? 0 : updateInGameUserRequest.Bonus;
                 context.InGameUsers.Update(inGameUser);
                 await context.SaveChangesAsync();
+            } else
+            {
+                throw new HostMisMatchException();
             }
         }
 
@@ -84,19 +84,68 @@ namespace LevelCounter.Services
             return users;
         }
 
-        public Game FinishGame(Game game)
+        public async Task<Game> StartGameAsync(int gameId, string userId)
         {
-            throw new System.NotImplementedException();
+            var game = context.Games.Where(g => g.Id == gameId).Include(g => g.InGameUsers).SingleOrDefault() ?? throw new ItemNotFoundException();
+            if (game.HostingUserId == userId)
+            {
+                game.IsRunning = true;
+                context.Games.Update(game);
+                await context.SaveChangesAsync();
+            }
+            return game;
         }
 
-        public Game LoadGame(int gameId)
+        public async Task<Game> QuitGameAsync(int gameId, string userId)
         {
-            throw new System.NotImplementedException();
+            var game = context.Games.Where(g => g.Id == gameId).SingleOrDefault() ?? throw new ItemNotFoundException();
+            if (game.HostingUserId == userId)
+            {
+                game.IsRunning = false;
+                context.Games.Update(game);
+                await context.SaveChangesAsync();
+            }
+            return game;
         }
 
-        public Game SaveGame(Game game)
+        public async Task<Game> LoadGameAsync(int gameId, string userId)
         {
-            throw new System.NotImplementedException();
+            var game = await context.Games.Where(g => g.Id == gameId)
+                .Include(i => i.InGameUsers)
+                .SingleOrDefaultAsync()
+                ?? throw new ItemNotFoundException();
+            if (CheckInGameUserInGameExists(game.InGameUsers, userId))
+            {
+                return game;
+            }
+            throw new  MissingInGameUserException();
+        }
+
+        private bool CheckInGameUserInGameExists(List<InGameUser> inGameUsers, string userId)
+        {
+            bool result = false;
+            foreach (var user in inGameUsers)
+            {
+                if (user.UserId == userId) break;
+            }
+            return result;
+        }
+
+        public async Task SaveGame(Game game, string userId)
+        {
+            if (game.HostingUserId == userId)
+            {
+                game.IsRunning = false;
+                context.Games.Update(game);
+                await context.SaveChangesAsync();
+            }
+            throw new HostMisMatchException();
+        }
+
+        public bool CheckHostId(int gameId, string userId)
+        {
+            var game = context.Games.Where(g => g.Id == gameId).SingleOrDefault() ?? throw new ItemNotFoundException();
+            return game.HostingUserId == userId ? true : false;
         }
     }
 }
