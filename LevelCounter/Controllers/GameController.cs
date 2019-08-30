@@ -45,7 +45,7 @@ namespace LevelCounter.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             try
             {
-                return new ObjectResult(await gameService.CreateGame(userId))
+                return new ObjectResult(await gameService.CreateGameAsync(userId))
                 {
                     StatusCode = 201
                 };
@@ -70,7 +70,7 @@ namespace LevelCounter.Controllers
             {
                 try
                 {
-                    return new ObjectResult(await gameService.AddInGameUsers(newGameRequest, userId))
+                    return new ObjectResult(await gameService.AddInGameUsersAsync(newGameRequest, userId))
                     {
                         StatusCode = 201
                     };

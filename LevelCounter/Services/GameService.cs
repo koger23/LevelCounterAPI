@@ -3,7 +3,6 @@ using LevelCounter.Exceptions;
 using LevelCounter.Models;
 using LevelCounter.Models.DTO;
 using LevelCounter.Repository;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +20,7 @@ namespace LevelCounter.Services
             this.mapper = mapper;
         }
 
-        public async Task<Game> CreateGame(string userId)
+        public async Task<Game> CreateGameAsync(string userId)
         {
             var user = context.Users.Where(u => u.Id == userId).SingleOrDefault();
             if (user == null)
@@ -37,12 +36,12 @@ namespace LevelCounter.Services
             return game;
         }
 
-        public async Task<Game> AddInGameUsers(NewGameRequest gameRequest, string userId)
+        public async Task<Game> AddInGameUsersAsync(NewGameRequest gameRequest, string userId)
         {
             var game = context.Games.Where(g => g.Id == gameRequest.gameId).SingleOrDefault();
             if (game != null && game.HostingUserId == userId)
             {
-                await CreateInGameUsersBasedOnUserName(gameRequest.UserNames, game);
+                await CreateInGameUsersBasedOnUserNameAsync(gameRequest.UserNames, game);
                 context.Update(game);
                 await context.SaveChangesAsync();
                 return game;
@@ -63,7 +62,7 @@ namespace LevelCounter.Services
             }
         }
 
-        private async Task<List<InGameUser>> CreateInGameUsersBasedOnUserName(List<string> userNames, Game game)
+        private async Task<List<InGameUser>> CreateInGameUsersBasedOnUserNameAsync(List<string> userNames, Game game)
         {
             var users = new List<InGameUser>();
             foreach (var username in userNames)
