@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LevelCounter.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20190829215712_1")]
-    partial class _1
+    [Migration("20190830221416_update")]
+    partial class update
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -109,6 +109,8 @@ namespace LevelCounter.Migrations
                     b.Property<int>("Bonus");
 
                     b.Property<int>("GameId");
+
+                    b.Property<int>("Gender");
 
                     b.Property<int>("Level");
 

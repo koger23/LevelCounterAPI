@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace LevelCounter.Migrations
 {
-    public partial class _1 : Migration
+    public partial class update : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -85,7 +85,8 @@ namespace LevelCounter.Migrations
                     UserName = table.Column<string>(nullable: true),
                     Level = table.Column<int>(nullable: false),
                     Bonus = table.Column<int>(nullable: false),
-                    GameId = table.Column<int>(nullable: false)
+                    GameId = table.Column<int>(nullable: false),
+                    Gender = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
