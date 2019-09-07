@@ -4,6 +4,7 @@ using LevelCounter.Models;
 using LevelCounter.Models.DTO;
 using LevelCounter.Repository;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,6 +30,11 @@ namespace LevelCounter.Services
             var savedGame = context.Games.Add(game);
             await context.SaveChangesAsync();
             return game;
+        }
+
+        public async Task<List<InGameUser>> GetInGameUsersByGameId(int gameId)
+        {
+            return await context.InGameUsers.Where(u => u.GameId == gameId).ToListAsync();
         }
 
         public async Task<Game> AddInGameUsersAsync(NewGameRequest gameRequest, string userId)
@@ -97,16 +103,14 @@ namespace LevelCounter.Services
             return game;
         }
 
-        public async Task<Game> QuitGameAsync(int gameId, string userId)
+        public async Task QuitGameAsync(int gameId, string userId)
         {
             var game = context.Games.Where(g => g.Id == gameId).SingleOrDefault() ?? throw new ItemNotFoundException();
             if (game.HostingUserId == userId)
             {
-                game.IsRunning = false;
-                context.Games.Update(game);
+                context.Games.Remove(game);
                 await context.SaveChangesAsync();
             }
-            return game;
         }
 
         public async Task<Game> LoadGameAsync(int gameId, string userId)
@@ -143,9 +147,19 @@ namespace LevelCounter.Services
         {
             if (game.HostingUserId == userId)
             {
-                game.IsRunning = false;
-                context.Games.Update(game);
+                var gameFromDb = context.Games.Where(g => g.Id == game.Id).Include(g => g.InGameUsers).FirstOrDefault() ?? throw new ItemNotFoundException();
+                gameFromDb.Time = game.Time;
+                gameFromDb.IsRunning = false;
+                game.InGameUsers.ForEach(i =>
+                {
+                    var user = gameFromDb.InGameUsers.Where(u => u.InGameUserId == i.InGameUserId).FirstOrDefault() ?? throw new ItemNotFoundException();
+                    user.Level = i.Level;
+                    user.Bonus = i.Bonus;
+                }
+                );
+                context.Games.Update(gameFromDb);
                 await context.SaveChangesAsync();
+                Console.WriteLine("***********Game saved.");
             }
             throw new HostMisMatchException();
         }
@@ -169,11 +183,11 @@ namespace LevelCounter.Services
             var games = await Task.Run(() =>
             {
                 return context.Games
-                .Include(g => g.InGameUsers)
-                .Where(g => g.HostingUserId == userId)
-                .Where(g => CheckInGameUserInGameExists(g.InGameUsers, userId))
-                .ToList()
-                ?? throw new ItemNotFoundException();
+                    .Include(g => g.InGameUsers)
+                    .Where(g => g.HostingUserId == userId)
+                    .Where(g => CheckInGameUserInGameExists(g.InGameUsers, userId))
+                    .ToList()
+                    ?? throw new ItemNotFoundException();
             });
             return games;
         }
