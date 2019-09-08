@@ -218,7 +218,7 @@ namespace LevelCounter.Services
                 if (game.IsRunning && CheckInGameUserInGameExists(game.InGameUsers, userId))
                 {
                     return game;
-                }
+                }   
                 else
                 {
                     throw new MissingInGameUserException();
