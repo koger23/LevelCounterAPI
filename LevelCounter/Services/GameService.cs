@@ -208,18 +208,23 @@ namespace LevelCounter.Services
 
         public async Task<Game> JoinGame(int gameId, string userId)
         {
-            var game = context.Games
+            var savedGame = await Task.Run(() =>
+            {
+                var game = context.Games
                 .Where(g => g.Id == gameId)
                 .Include(g => g.InGameUsers)
                 .FirstOrDefault()
                 ?? throw new ItemNotFoundException();
-            if (game.IsRunning && CheckInGameUserInGameExists(game.InGameUsers, userId))
-            {
-                return game;
-            } else
-            {
-                throw new MissingInGameUserException();
-            }
+                if (game.IsRunning && CheckInGameUserInGameExists(game.InGameUsers, userId))
+                {
+                    return game;
+                }
+                else
+                {
+                    throw new MissingInGameUserException();
+                }
+            });
+            return savedGame;
         }
     }
 }
