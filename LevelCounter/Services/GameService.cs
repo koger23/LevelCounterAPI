@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using LevelCounter.Exceptions;
+﻿using LevelCounter.Exceptions;
 using LevelCounter.Models;
 using LevelCounter.Models.DTO;
 using LevelCounter.Repository;
@@ -205,6 +204,22 @@ namespace LevelCounter.Services
                 ?? throw new ItemNotFoundException();
             });
             return games;
+        }
+
+        public async Task<Game> JoinGame(int gameId, string userId)
+        {
+            var game = context.Games
+                .Where(g => g.Id == gameId)
+                .Include(g => g.InGameUsers)
+                .FirstOrDefault()
+                ?? throw new ItemNotFoundException();
+            if (game.IsRunning && CheckInGameUserInGameExists(game.InGameUsers, userId))
+            {
+                return game;
+            } else
+            {
+                throw new MissingInGameUserException();
+            }
         }
     }
 }

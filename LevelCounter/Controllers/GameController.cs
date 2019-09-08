@@ -225,5 +225,19 @@ namespace LevelCounter.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return Ok(await gameService.GetRelatedGames(userId));
         }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpGet("joinGame")]
+        public async Task<IActionResult> JoinGame([FromQuery] int gameId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                return Ok(await gameService.JoinGame(gameId, userId));
+            } catch(MissingInGameUserException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }
