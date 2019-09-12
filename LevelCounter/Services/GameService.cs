@@ -226,5 +226,21 @@ namespace LevelCounter.Services
             });
             return savedGame;
         }
+
+        public async Task UpdateGame(Game game, string userId)
+        {
+            await Task.Run(async () =>
+            {
+                if (game.IsRunning && CheckInGameUserInGameExists(game.InGameUsers, userId))
+                {
+                    context.Games.Update(game);
+                    await context.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new MissingInGameUserException();
+                }
+            });
+        }
     }
 }

@@ -239,5 +239,20 @@ namespace LevelCounter.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpPut("updateGame")]
+        public async Task<IActionResult> UpdateGame([FromBody] Game game)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                await gameService.UpdateGame(game, userId);
+                return Ok();
+            } catch(MissingInGameUserException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

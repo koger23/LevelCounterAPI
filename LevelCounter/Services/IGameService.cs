@@ -20,5 +20,6 @@ namespace LevelCounter.Services
         Task<List<Game>> GetHostedGames(string userId);
         Task<List<Game>> GetRelatedGames(string userId);
         Task<Game> JoinGame(int gameId, string userId);
+        Task UpdateGame(Game game, string userId);
     }
 }
