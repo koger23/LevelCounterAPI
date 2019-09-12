@@ -1,6 +1,7 @@
 ﻿using LevelCounter.Configs;
 using LevelCounter.Models;
 using LevelCounter.Repository;
+using LevelCounter.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -29,6 +30,7 @@ namespace LevelCounter
             services.AddSwaggerDoc();
             services.RegisterServices();
             services.AddMvcConfiguration();
+            services.AddSignalR();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationContext applicationContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
@@ -54,6 +56,10 @@ namespace LevelCounter
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1");
+            });
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<GameHub>("/gameHub");
             });
             app.UseMvc();
         }
