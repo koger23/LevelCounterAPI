@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using LevelCounter.Services;
+using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 
 namespace LevelCounter.Hubs
@@ -35,10 +37,10 @@ namespace LevelCounter.Hubs
         //    Clients.All.SendAsync("broadcastMessage", name, message);
         //}
 
-        public void Send(string name)
+        public async Task Send(string gameJson)
         {
             // Call the broadcastMessage method to update clients.
-            Clients.All.SendAsync("broadcastMessage", name);
+            await Clients.All.SendAsync("broadcastMessage", gameJson);
         }
     }
 }
