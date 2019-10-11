@@ -92,7 +92,10 @@ namespace LevelCounter.Services
 
         public async Task<Game> StartGameAsync(int gameId, string userId)
         {
-            var game = context.Games.Where(g => g.Id == gameId).Include(g => g.InGameUsers).SingleOrDefault() ?? throw new ItemNotFoundException();
+            var game = context.Games.Where(g => g.Id == gameId)
+                .Include(g => g.InGameUsers)
+                .SingleOrDefault() 
+                ?? throw new ItemNotFoundException();
             if (game.HostingUserId == userId)
             {
                 game.IsRunning = true;
@@ -146,32 +149,39 @@ namespace LevelCounter.Services
         {
             if (game.HostingUserId == userId)
             {
-                var gameFromDb = context.Games.Where(g => g.Id == game.Id).Include(g => g.InGameUsers).FirstOrDefault() ?? throw new ItemNotFoundException();
+                var gameFromDb = context.Games.Where(g => g.Id == game.Id)
+                    .Include(g => g.InGameUsers)
+                    .FirstOrDefault() ?? throw new ItemNotFoundException();
                 gameFromDb.Time = game.Time;
                 gameFromDb.IsRunning = false;
                 game.InGameUsers.ForEach(i =>
                 {
-                    var user = gameFromDb.InGameUsers.Where(u => u.InGameUserId == i.InGameUserId).FirstOrDefault() ?? throw new ItemNotFoundException();
+                    var user = gameFromDb.InGameUsers.Where(u => u.InGameUserId == i.InGameUserId)
+                        .FirstOrDefault() 
+                        ?? throw new ItemNotFoundException();
                     user.Level = i.Level;
                     user.Bonus = i.Bonus;
                 }
                 );
                 context.Games.Update(gameFromDb);
                 await context.SaveChangesAsync();
-                Console.WriteLine("***********Game saved.");
             }
             throw new HostMisMatchException();
         }
 
         public bool CheckHostId(int gameId, string userId)
         {
-            var game = context.Games.Where(g => g.Id == gameId).SingleOrDefault() ?? throw new ItemNotFoundException();
+            var game = context.Games.Where(g => g.Id == gameId)
+                .SingleOrDefault() 
+                ?? throw new ItemNotFoundException();
             return game.HostingUserId == userId ? true : false;
         }
 
         public async Task DeleteGameAsync(int gameId, string userId)
         {
-            var game = context.Games.Where(g => g.Id == gameId).SingleOrDefault() ?? throw new ItemNotFoundException();
+            var game = context.Games.Where(g => g.Id == gameId)
+                .SingleOrDefault() 
+                ?? throw new ItemNotFoundException();
             if (game.HostingUserId != userId) throw new HostMisMatchException();
             context.Games.Remove(game);
             await context.SaveChangesAsync();
