@@ -5,10 +5,10 @@ namespace LevelCounter.Hubs
 {
     public class GameHub : Hub
     {
-        public async Task Send(string gameJson, string gameId, string updatedUser)
+        public async Task Send(string gameJson, string gameId)
         {
             await Clients.Group(gameId)
-                .SendAsync("broadcastMessage", gameJson, updatedUser);
+                .SendAsync("broadcastMessage", gameJson);
         }
 
         public async Task AddToGroup(string gameId, string userId)
