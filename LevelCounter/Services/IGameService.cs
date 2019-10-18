@@ -15,10 +15,10 @@ namespace LevelCounter.Services
         Task SaveGameAsync(Game game, string userId);
         Task<Game> StartGameAsync(int gameId, string userId);
         Task QuitGameAsync(Game game, string userId);
-        Task<bool> CheckHostIdAsync(int gameId, string userId);
+        bool CheckHostId(int gameId, string userId);
         Task DeleteGameAsync(int gameId, string userId);
-        Task<List<Game>> GetHostedGamesAsync(string userId);
-        Task<List<Game>> GetRelatedGames(string userId);
+        List<Game> GetHostedGames(string userId);
+        List<Game> GetRelatedGames(string userId);
         Task<Game> JoinGame(int gameId, string userId);
         Task UpdateGame(Game game, string userId);
     }

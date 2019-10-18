@@ -28,7 +28,7 @@ namespace LevelCounter.Controllers
         public async Task<IActionResult> StartGame([FromQuery] int gameId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (await gameService.CheckHostIdAsync(gameId, userId))
+            if (gameService.CheckHostId(gameId, userId))
             {
                 try
                 {
@@ -155,7 +155,7 @@ namespace LevelCounter.Controllers
         public async Task<IActionResult> QuitGame([FromBody] Game game)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (await gameService.CheckHostIdAsync(game.Id, userId))
+            if (gameService.CheckHostId(game.Id, userId))
             {
                 try
                 {
@@ -212,18 +212,18 @@ namespace LevelCounter.Controllers
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
         [HttpGet("savedGames")]
-        public async Task<IActionResult> ListSavedGames()
+        public IActionResult ListSavedGames()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return Ok(await gameService.GetHostedGamesAsync(userId));
+            return Ok(gameService.GetHostedGames(userId));
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
         [HttpGet("joinableGames")]
-        public async Task<IActionResult> ListJoinableGames()
+        public IActionResult ListJoinableGames()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return Ok(await gameService.GetRelatedGames(userId));
+            return Ok(gameService.GetRelatedGames(userId));
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
