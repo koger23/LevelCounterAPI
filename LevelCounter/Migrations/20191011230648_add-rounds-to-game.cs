@@ -2,13 +2,13 @@
 
 namespace LevelCounter.Migrations
 {
-    public partial class add_ingame_gender : Migration
+    public partial class addroundstogame : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
-                name: "Gender",
-                table: "InGameUsers",
+                name: "Rounds",
+                table: "Games",
                 nullable: false,
                 defaultValue: 0);
         }
@@ -16,8 +16,8 @@ namespace LevelCounter.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Gender",
-                table: "InGameUsers");
+                name: "Rounds",
+                table: "Games");
         }
     }
 }

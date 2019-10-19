@@ -25,7 +25,7 @@ namespace LevelCounter.Services
 
         public async Task<Statistics> GetUserStatistics(string userId)
         {
-            var user = await accountService.FindByIdAsync(userId);
+            var user = await accountService.FindByIdAsync(userId); 
             return await context.Statistics
                 .Include(s => s.ApplicationUser)
                 .SingleOrDefaultAsync(s => s.StatisticsId == user.StatisticsId) ?? throw new ItemNotFoundException();
@@ -46,6 +46,28 @@ namespace LevelCounter.Services
             userStats.RoundsPlayed = userStats.RoundsPlayed <= dtoStats.RoundsPlayed ? dtoStats.RoundsPlayed : userStats.RoundsPlayed;
             userStats.Wins = userStats.Wins <= dtoStats.Wins ? dtoStats.Wins : userStats.Wins;
             return userStats;
+        }
+
+        public async Task IncreaseGamesPlayedAsync(string userId)
+        {
+            var user = await accountService.FindByIdAsync(userId);
+            var stat = await context.Statistics
+                .Include(s => s.ApplicationUser)
+                .SingleOrDefaultAsync(s => s.StatisticsId == user.StatisticsId) ?? throw new ItemNotFoundException();
+            stat.GamesPlayed++;
+            context.Statistics.Update (stat);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task IncreaseWinsAsync(string userId)
+        {
+            var user = await accountService.FindByIdAsync(userId);
+            var stat = await context.Statistics
+                .Include(s => s.ApplicationUser)
+                .SingleOrDefaultAsync(s => s.StatisticsId == user.StatisticsId) ?? throw new ItemNotFoundException();
+            stat.Wins++;
+            context.Statistics.Update(stat);
+            await context.SaveChangesAsync();
         }
     }
 }

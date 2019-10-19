@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LevelCounter.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20190830093113_add_ingame_gender")]
-    partial class add_ingame_gender
+    [Migration("20190910091506_setup")]
+    partial class setup
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

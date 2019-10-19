@@ -1,4 +1,5 @@
 ﻿using LevelCounter.Exceptions;
+using LevelCounter.Models;
 using LevelCounter.Models.DTO;
 using LevelCounter.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -23,11 +24,11 @@ namespace LevelCounter.Controllers
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
-        [HttpGet("startGame")]
+        [HttpPost("startGame")]
         public async Task<IActionResult> StartGame([FromQuery] int gameId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (gameService.CheckHostId(gameId, userId))
+            if (await gameService.CheckHostIdAsync(gameId, userId))
             {
                 try
                 {
@@ -42,22 +43,37 @@ namespace LevelCounter.Controllers
 
         }
 
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateNewGame()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             try
             {
-                return new ObjectResult(await gameService.CreateGameAsync(userId))
-                {
-                    StatusCode = 201
-                };
+                return Ok(await gameService.CreateGameAsync(userId));
             }
             catch (ItemNotFoundException e)
             {
                 return BadRequest(e.Message);
             }
             catch (FormatException e)
+            {
+                return BadRequest(e.Message);
+            }
+
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpGet("getPlayers")]
+        public async Task<IActionResult> CreateNewGame([FromQuery] int gameId)
+        {
+            try
+            {
+                var list = await gameService.GetInGameUsersByGameIdAsync(gameId);
+                if (list.Count > 0) return Ok(list);
+                return BadRequest("Invalid game id");
+            }
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
@@ -73,10 +89,7 @@ namespace LevelCounter.Controllers
             {
                 try
                 {
-                    return new ObjectResult(await gameService.AddInGameUsersAsync(newGameRequest, userId))
-                    {
-                        StatusCode = 201
-                    };
+                    return Ok(await gameService.AddInGameUsersAsync(newGameRequest, userId));
                 }
                 catch (ItemNotFoundException e)
                 {
@@ -118,15 +131,36 @@ namespace LevelCounter.Controllers
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
-        [HttpGet("quitGame")]
-        public async Task<IActionResult> QuitGame([FromQuery] int gameId)
+        [HttpPut("saveGame")]
+        public async Task<IActionResult> SaveGame([FromBody] Game game)
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                await gameService.SaveGameAsync(game, userId);
+                return Ok("Game saved");
+            }
+            catch (ItemNotFoundException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (HostMisMatchException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpPost("quitGame")]
+        public async Task<IActionResult> QuitGame([FromBody] Game game)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (gameService.CheckHostId(gameId, userId))
+            if (await gameService.CheckHostIdAsync(game.Id, userId))
             {
                 try
                 {
-                    return Ok(await gameService.QuitGameAsync(gameId, userId));
+                    await gameService.QuitGameAsync(game, userId);
+                    return Ok();
                 }
                 catch (ItemNotFoundException e)
                 {
@@ -181,7 +215,7 @@ namespace LevelCounter.Controllers
         public async Task<IActionResult> ListSavedGames()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return Ok(await gameService.GetHostedGames(userId));
+            return Ok(await gameService.GetHostedGamesAsync(userId));
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
@@ -190,6 +224,35 @@ namespace LevelCounter.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return Ok(await gameService.GetRelatedGames(userId));
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpGet("joinGame")]
+        public async Task<IActionResult> JoinGame([FromQuery] int gameId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                return Ok(await gameService.JoinGame(gameId, userId));
+            } catch(MissingInGameUserException e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
+        [HttpPut("updateGame")]
+        public async Task<IActionResult> UpdateGame([FromBody] Game game)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            try
+            {
+                await gameService.UpdateGame(game, userId);
+                return Ok();
+            } catch(MissingInGameUserException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }

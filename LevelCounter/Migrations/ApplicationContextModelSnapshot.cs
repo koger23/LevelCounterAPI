@@ -92,6 +92,8 @@ namespace LevelCounter.Migrations
 
                     b.Property<bool>("IsRunning");
 
+                    b.Property<int>("Rounds");
+
                     b.Property<long>("Time");
 
                     b.HasKey("Id");
