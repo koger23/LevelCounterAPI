@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace LevelCounter.Exceptions
 {
     [Serializable]
-    internal class HostMisMatchException : Exception
+    public class HostMisMatchException : Exception
     {
         public HostMisMatchException()
         {

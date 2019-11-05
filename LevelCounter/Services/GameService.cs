@@ -92,7 +92,11 @@ namespace LevelCounter.Services
 
         public async Task<Game> StartGameAsync(int gameId, string userId)
         {
-            var game = context.Games.Where(g => g.Id == gameId).Include(g => g.InGameUsers).SingleOrDefault() ?? throw new ItemNotFoundException();
+            var game = context.Games.Where(g => g.Id == gameId)
+                .Include(g => g.InGameUsers)
+                .SingleOrDefault() 
+                ?? throw new ItemNotFoundException();
+
             if (game.HostingUserId == userId)
             {
                 game.IsRunning = true;
