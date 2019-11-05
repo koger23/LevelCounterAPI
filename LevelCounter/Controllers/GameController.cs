@@ -28,7 +28,7 @@ namespace LevelCounter.Controllers
         public async Task<IActionResult> StartGame([FromQuery] int gameId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (gameService.CheckHostId(gameId, userId))
+            if (await gameService.CheckHostIdAsync(gameId, userId))
             {
                 try
                 {
@@ -67,7 +67,7 @@ namespace LevelCounter.Controllers
         {
             try
             {
-                var list = await gameService.GetInGameUsersByGameId(gameId);
+                var list = await gameService.GetInGameUsersByGameIdAsync(gameId);
                 if (list.Count > 0) return Ok(list);
                 return BadRequest("Invalid game id");
             }
@@ -135,7 +135,7 @@ namespace LevelCounter.Controllers
             try
             {
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                await gameService.SaveGame(game, userId);
+                await gameService.SaveGameAsync(game, userId);
                 return Ok("Game saved");
             }
             catch (ItemNotFoundException e)
@@ -149,15 +149,15 @@ namespace LevelCounter.Controllers
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
-        [HttpGet("quitGame")]
-        public async Task<IActionResult> QuitGame([FromQuery] int gameId)
+        [HttpPost("quitGame")]
+        public async Task<IActionResult> QuitGame([FromBody] Game game)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (gameService.CheckHostId(gameId, userId))
+            if (await gameService.CheckHostIdAsync(game.Id, userId))
             {
                 try
                 {
-                    await gameService.QuitGameAsync(gameId, userId);
+                    await gameService.QuitGameAsync(game, userId);
                     return Ok();
                 }
                 catch (ItemNotFoundException e)
@@ -213,7 +213,7 @@ namespace LevelCounter.Controllers
         public async Task<IActionResult> ListSavedGames()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return Ok(await gameService.GetHostedGames(userId));
+            return Ok(await gameService.GetHostedGamesAsync(userId));
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]

@@ -4,7 +4,7 @@ namespace LevelCounter.Models.DTO
 {
     public class NewGameRequest
     {
-        public int gameId { get; set; }
+        public int GameId { get; set; }
         public List<string> UserNames { get; set; }
     }
 }
