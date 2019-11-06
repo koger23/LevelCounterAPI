@@ -26,8 +26,8 @@ namespace LevelCounterTests
             var userId = "userid";
             var game = new Game();
 
-            gameServiceMock.Setup(x => x.CheckHostId(gameId, userId))
-                .Returns(true);
+            gameServiceMock.Setup(x => x.CheckHostIdAsync(gameId, userId))
+                .Returns(Task.FromResult(true));
             gameServiceMock.Setup(x => x.StartGameAsync(gameId, userId))
                 .Returns(Task.FromResult(game));
 
@@ -51,8 +51,8 @@ namespace LevelCounterTests
             var gameId = 1;
             var userId = "userid";
 
-            gameServiceMock.Setup(x => x.CheckHostId(gameId, userId))
-                .Returns(true);
+            gameServiceMock.Setup(x => x.CheckHostIdAsync(gameId, userId))
+                .Returns(Task.FromResult(true));
             gameServiceMock.Setup(x => x.StartGameAsync(gameId, userId))
                 .Throws(new ItemNotFoundException());
 
@@ -76,8 +76,8 @@ namespace LevelCounterTests
             var gameId = 1;
             var userId = "test-userid";
             
-            gameServiceMock.Setup(x => x.CheckHostId(gameId, userId))
-                .Returns(false);
+            gameServiceMock.Setup(x => x.CheckHostIdAsync(gameId, userId))
+                .Returns(Task.FromResult(true));
 
             // Act
             var result = await controller.StartGame(gameId);
