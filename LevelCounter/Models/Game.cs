@@ -1,8 +1,5 @@
-﻿using LevelCounter.Models.DTO;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 
 namespace LevelCounter.Models
 {
@@ -14,5 +11,6 @@ namespace LevelCounter.Models
         public List<InGameUser> InGameUsers { get; set; } = new List<InGameUser>();
         public string HostingUserId { get; set; }
         public bool IsRunning { get; set; } = false;
+        public int Rounds { get; set; } = 1;
     }
 }
