@@ -4,6 +4,7 @@ using LevelCounter.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -62,6 +63,15 @@ namespace LevelCounter.Exceptions
                 return BadRequest(userEditRequest);
             }
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Console.WriteLine(
+                    userEditRequest.AvatarUrl,
+                    userEditRequest.CurrentPassword,
+                    userEditRequest.NewPassword,
+                    userEditRequest.VerifyNewPassword,
+                    userEditRequest.UserName,
+                    userEditRequest.FullName,
+                    userEditRequest.Email
+                );
             var errors = await accountService.UpdateAsync(userId, userEditRequest);
             if (errors.Count == 0)
             {

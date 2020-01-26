@@ -119,12 +119,18 @@ namespace LevelCounter.Services
             user.Email = userEditRequest.Email;
             user.UserName = userEditRequest.UserName;
             user.FullName = userEditRequest.FullName;
-            var passwordChangeResult = await userManager.ChangePasswordAsync(user, userEditRequest.CurrentPassword, userEditRequest.NewPassword);
-            if (!passwordChangeResult.Succeeded)
+
+            var passwordChangeResult = IdentityResult.Success;
+            if (userEditRequest.NewPassword.Length != 0 && userEditRequest.NewPassword == userEditRequest.VerifyNewPassword)
             {
-                errorList.AddRange(passwordChangeResult.Errors
-                    .Select(e => e.Description)
-                    .ToList());
+                passwordChangeResult = await userManager.ChangePasswordAsync(user, userEditRequest.CurrentPassword, userEditRequest.NewPassword);
+
+                if (!passwordChangeResult.Succeeded)
+                {
+                    errorList.AddRange(passwordChangeResult.Errors
+                        .Select(e => e.Description)
+                        .ToList());
+                }
             }
             var userUpdateResult = await userManager.UpdateAsync(user);
             if (!userUpdateResult.Succeeded)
