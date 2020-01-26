@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
+using System;
 
 namespace LevelCounter.Hubs
 {
@@ -19,6 +20,11 @@ namespace LevelCounter.Hubs
         public async Task RemoveFromGroup(string gameId)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, gameId);
+        }
+
+        public async Task HeartBeat(string gameId, string userId) {
+            await Clients.Group(gameId)
+                .SendAsync("isOnline", userId);
         }
     }
 }
