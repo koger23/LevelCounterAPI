@@ -26,5 +26,19 @@ namespace LevelCounter.Hubs
             await Clients.Group(gameId)
                 .SendAsync("isOnline", userId);
         }
+
+        public async Task SyncUser(string gameId, string inGameUser) {
+            await Clients.Group(gameId)
+                .SendAsync("user", inGameUser);
+        }
+
+        public async Task SyncTime(string gameId, string time) {
+            await Clients.Group(gameId)
+                .SendAsync("time", time);
+        }
+
+        public async Task SendGameMessage(string gameId, string message) {
+            await Clients.Group(gameId).SendAsync("message", message);
+        }
     }
 }
