@@ -65,11 +65,11 @@ namespace LevelCounter.Controllers
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
         [HttpGet("getPlayers")]
-        public async Task<IActionResult> CreateNewGame([FromQuery] int gameId)
+        public IActionResult CreateNewGame([FromQuery] int gameId)
         {
             try
             {
-                var list = await gameService.GetInGameUsersByGameIdAsync(gameId);
+                var list = gameService.GetInGameUsersByGameIdAsync(gameId);
                 if (list.Count > 0) return Ok(list);
                 return BadRequest("Invalid game id");
             }
