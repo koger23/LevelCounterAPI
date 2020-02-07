@@ -35,11 +35,11 @@ namespace LevelCounter.Services
             return game;
         }
 
-        public async Task<List<InGameUser>> GetInGameUsersByGameIdAsync(int gameId)
+        public List<InGameUser> GetInGameUsersByGameIdAsync(int gameId)
         {
-            return await context.InGameUsers
+            return context.InGameUsers
                 .Where(u => u.GameId == gameId)
-                .ToListAsync();
+                .ToList();
         }
 
         public async Task<Game> AddInGameUsersAsync(NewGameRequest gameRequest, string userId)
@@ -237,11 +237,11 @@ namespace LevelCounter.Services
             throw new HostMisMatchException("You cannot delete this game, not belong to you.");
         }
 
-        public async Task<bool> CheckHostIdAsync(int gameId, string userId)
+        public bool CheckHostId(int gameId, string userId)
         {
-            var game = await context.Games
+            var game = context.Games
                 .Where(g => g.Id == gameId)
-                .SingleOrDefaultAsync()
+                .SingleOrDefault()
                 ?? throw new ItemNotFoundException($"Game with id {gameId} not found.");
             return game.HostingUserId == userId ? true : false;
         }
@@ -259,25 +259,25 @@ namespace LevelCounter.Services
             await context.SaveChangesAsync();
         }
 
-        public async Task<List<Game>> GetHostedGamesAsync(string userId)
+        public List<Game> GetHostedGames(string userId)
         {
-            return await context.Games
+            return context.Games
                 .Include(g => g.InGameUsers)
                 .Where(g => g.HostingUserId == userId)
                 .Where(g => CheckInGameUserInGameExists(g.InGameUsers, userId))
-                .ToListAsync()
+                .ToList()
                 ?? throw new ItemNotFoundException("No games available.");
         }
 
-        public async Task<List<Game>> GetRelatedGames(string userId)
+        public List<Game> GetRelatedGames(string userId)
         {
-            return await (context.Games
+            return context.Games
                 .Include(g => g.InGameUsers)
                 .Where(g => g.HostingUserId != userId)
                 .Where(g => g.IsRunning == true)
                 .Where(g => CheckInGameUserInGameExists(g.InGameUsers, userId))
-                .ToListAsync()
-                ?? throw new ItemNotFoundException("No games available."));
+                .ToList()
+                ?? throw new ItemNotFoundException("No games available.");
         }
 
         public async Task<Game> JoinGame(int gameId, string userId)

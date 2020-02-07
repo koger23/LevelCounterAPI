@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LevelCounter.Models
 {
@@ -12,6 +13,8 @@ namespace LevelCounter.Models
         public int Bonus { get; set; }
         public int GameId { get; set; }
         public ApplicationUser.Genders Gender { get; set; } = ApplicationUser.Genders.MALE;
+        [NotMapped]
+        public bool IsOnline { get; set; } = false;
         public InGameUser()
         {
             Level = 1;
