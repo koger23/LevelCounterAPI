@@ -13,6 +13,7 @@ To create a Web API for counting player's level and bonus for any games (e.g. fo
 - friends can join to the host
 - friends can manipulate their points real-time (with SignalR WebSockets)
 - connect to players to make friends to play with
-- discard connection request, ban players
+- discard connection request, ban friends
 - check their statistics (played game/time/rounds)
-- users can edit their profile
+- users can edit their profile (change password/avatar etc)
+- check their statistics (played game/time/rounds)

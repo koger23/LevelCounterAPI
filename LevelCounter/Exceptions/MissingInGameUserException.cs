@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace LevelCounter.Exceptions
 {
     [Serializable]
-    internal class MissingInGameUserException : Exception
+    public class MissingInGameUserException : Exception
     {
         public MissingInGameUserException()
         {

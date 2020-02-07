@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace LevelCounter.Exceptions
 {
     [Serializable]
-    internal class ItemNotFoundException : Exception
+    public class ItemNotFoundException : Exception
     {
         public ItemNotFoundException()
         {

@@ -39,8 +39,7 @@ namespace LevelCounter.Controllers
                     return BadRequest(e.Message);
                 }
             }
-            return BadRequest();
-
+            return BadRequest("Host id mismatch");
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]
@@ -60,7 +59,6 @@ namespace LevelCounter.Controllers
             {
                 return BadRequest(e.Message);
             }
-
         }
 
         [Authorize(AuthenticationSchemes = authScheme, Roles = "User")]

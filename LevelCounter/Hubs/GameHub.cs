@@ -8,11 +8,12 @@ namespace LevelCounter.Hubs
     {
         public async Task Send(string gameJson, string gameId)
         {
+            await Groups.AddToGroupAsync(Context.ConnectionId, gameId);
             await Clients.Group(gameId)
                 .SendAsync("broadcastMessage", gameJson);
         }
 
-        public async Task AddToGroup(string gameId, string userId)
+        public async Task AddToGroup(string gameId)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, gameId);
         }
