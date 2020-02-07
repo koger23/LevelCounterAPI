@@ -8,7 +8,7 @@ namespace LevelCounter.Services
     public interface IGameService
     {
         Task<Game> CreateGameAsync(string userId);
-        Task<List<InGameUser>> GetInGameUsersByGameIdAsync(int gameId);
+        List<InGameUser> GetInGameUsersByGameIdAsync(int gameId);
         Task<Game> AddInGameUsersAsync(NewGameRequest gameRequest, string userId);
         Task UpdateInGameUserAsync(UpdateInGameUserRequest updateInGameUserRequest, string userId);
         Task<Game> LoadGameAsync(int gameId, string userId);

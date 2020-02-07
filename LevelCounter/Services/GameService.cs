@@ -35,11 +35,11 @@ namespace LevelCounter.Services
             return game;
         }
 
-        public async Task<List<InGameUser>> GetInGameUsersByGameIdAsync(int gameId)
+        public List<InGameUser> GetInGameUsersByGameIdAsync(int gameId)
         {
-            return await context.InGameUsers
+            return context.InGameUsers
                 .Where(u => u.GameId == gameId)
-                .ToListAsync();
+                .ToList();
         }
 
         public async Task<Game> AddInGameUsersAsync(NewGameRequest gameRequest, string userId)
